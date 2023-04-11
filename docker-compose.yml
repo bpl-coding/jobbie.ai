@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  # celery-worker:
+  #     profiles:
+  #       - "worker"
+  #     restart: always
+  #     build:
+  #       context: .
+  #       dockerfile: docker/celery-worker/Dockerfile
+  #       args: 
+  #       - BUILDKIT_INLINE_CACHE=1
+  #     depends_on:
+  #       - postgres
+  #       - redis
+  #     environment:
+  #       - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
+  #       - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
+  #       - DJANGO_DATABASE_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+  #       - DJANGO_DATABASE_HOST=${DJANGO_DATABASE_HOST}
+  #       - DJANGO_DATABASE_PORT=${DJANGO_DATABASE_PORT}
+  #       - DJANGO_DEBUG=${DJANGO_DEBUG}
+  #       - REDIS_URL=${WORKER_REDIS_URL}
+  #     networks:
+  #       - postgres
+  #       - redis
+
+  postgres:
+    container_name: postgres
+    build:
+      context: ./docker/postgres
+    environment:
+      POSTGRES_USER: ${DJANGO_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DJANGO_DATABASE_PASSWORD}
+      POSTGRES_DB: ${DJANGO_POSTGRES_DB}
+      PGDATA: /data/postgres
+    volumes:
+      - ./.data/postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  # redis:
+  #   image: "redis:alpine"
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - redis
+
+networks:
+  postgres:
+    driver: bridge
+  # redis:
+  #   driver: bridge
+
+volumes:
+  postgres:
+
+
