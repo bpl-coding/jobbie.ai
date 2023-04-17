@@ -5,6 +5,13 @@ from .models import HNJobPosting, HNWhosHiringPost, Resume
 # Register your models here.
 
 
-admin.site.register(HNJobPosting)
+
+
+class HNJobPostingAdmin(admin.ModelAdmin):
+   model = HNJobPosting
+   exclude = ['embedding']
+
+
+admin.site.register(HNJobPosting, HNJobPostingAdmin)
 admin.site.register(HNWhosHiringPost)
 admin.site.register(Resume)

@@ -66,9 +66,11 @@ export type HnJobPostingSchemaOut = {
   whos_hiring_post: number;
   hn_id: number;
   posted_by: string;
-  text: string;
   time_posted: number;
   updated_at: string;
+  raw_text: string;
+  display_text: string;
+  embedding_text: string;
 };
 export type JobsOut = {
   jobs: HnJobPostingSchemaOut[];

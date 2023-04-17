@@ -24,6 +24,11 @@ export default defineConfig({
       port: 3000,
       protocol: 'ws',
     },
+    cors: {
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    }
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

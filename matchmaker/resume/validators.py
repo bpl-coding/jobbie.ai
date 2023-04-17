@@ -9,6 +9,6 @@ class DistanceValidator(str):
 
     @classmethod
     def validate(cls, v):
-        if v not in {'l2', 'cosine'}:
-            raise ValueError("Distance must be 'l2' or 'cosine'")
+        if v not in {'l2', 'cosine', 'maxInnerProduct'}:
+            raise ValueError("Distance must be 'l2' or 'cosine', or 'maxInnerProduct'")
         return v

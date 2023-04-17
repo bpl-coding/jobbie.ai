@@ -12,6 +12,8 @@ from .models import HNJobPosting
 
 
 class HNJobPostingSchemaOut(ModelSchema):
+    # rename display_text from the model to text for the API
+    # text: str = HNJobPosting.display_text
     class Config:
         model = HNJobPosting
         model_exclude = ['embedding']

@@ -8,7 +8,7 @@ from pgvector.django import IvfflatIndex, VectorField
 
 class Resume(models.Model):
     text = models.TextField()
-    hash = models.PositiveIntegerField()
+    hash = models.PositiveBigIntegerField()
     embedding = VectorField(dimensions=1536, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -18,11 +18,14 @@ class HNJobPosting(models.Model):
     whos_hiring_post = models.ForeignKey('HNWhosHiringPost', on_delete=models.PROTECT)
     hn_id = models.IntegerField(unique=True)
     posted_by = models.CharField(max_length=200)
-    text = models.TextField()
     time_posted = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
     # embedding = VectorField(dimensions=384, null=True, blank=True)
     embedding = VectorField(dimensions=1536, null=True, blank=True)
+
+    raw_text = models.TextField()
+    display_text = models.TextField()
+    embedding_text = models.TextField()
 
     # class Meta:
     #     indexes = [

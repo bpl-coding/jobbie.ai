@@ -1,4 +1,5 @@
 import subprocess
+from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 
 import mmh3
@@ -7,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from ninja import File, NinjaAPI, Router
 from ninja.files import UploadedFile
 from ninja.pagination import PageNumberPagination, paginate
-from pgvector.django import CosineDistance, L2Distance
+from pgvector.django import CosineDistance, L2Distance, MaxInnerProduct
 
 from .models import HNJobPosting, HNWhosHiringPost, Resume
 from .schema import (
@@ -20,6 +21,7 @@ from .schema import (
 from .tasks import get_hn_job_postings
 from .utils import get_embedding
 from .validators import DistanceValidator
+from ninja.errors import HttpError
 
 router = Router()
 
@@ -30,6 +32,16 @@ router = Router()
     response=UploadResumeOut
 )
 def resume_pdf_to_text(request, file: UploadedFile = File(...)):
+
+    # Reject files larger than 2MB
+    max_file_size = 2 * 1024 * 1024  # 2MB in bytes
+    if file.size > max_file_size:
+        raise HttpError(413, "File size should not exceed 2MB")
+        
+    # Reject files that are not PDFs
+    if file.content_type != "application/pdf":
+        raise HttpError(415, "File must be a PDF")
+
 
     pdf_buffer = NamedTemporaryFile(suffix=".pdf")
     pdf_buffer.write(file.read())
@@ -65,6 +77,7 @@ def get_jobs(
     distance_mapping = {
         "l2": L2Distance,
         "cosine": CosineDistance,
+        "maxInnerProduct": MaxInnerProduct
     }
 
     distance = distance_mapping[distance]
@@ -72,7 +85,13 @@ def get_jobs(
     resume = get_object_or_404(Resume, id=resume_id)
     embedding = resume.embedding
 
-    closest_jobs = HNJobPosting.objects.filter(embedding__isnull=False).order_by(
+    closest_jobs = HNJobPosting.objects.filter(
+        embedding__isnull=False,
+        # last 30 days 
+        # datetime.now() - timedelta(days=30) -> convert to epoch int
+
+        time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp()
+    ).order_by(
         distance("embedding", embedding)
     )
 
@@ -102,6 +121,8 @@ def create_resume(request, resume: CreateResumeIn):
     embedding = get_embedding(resume_text)
 
     hash = mmh3.hash(resume_text, signed=False)
+
+    print(hash)
 
     if Resume.objects.filter(hash=hash).exists():
         resume = Resume.objects.get(hash=hash)
