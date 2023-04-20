@@ -18,3 +18,21 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 } */
+
+/* 
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+.wrap-display-text code {
+  display: inline-block;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+.wrap-display-text p {
+  margin-top: 1.25em;
+} */

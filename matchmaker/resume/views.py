@@ -6,6 +6,7 @@ import mmh3
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from ninja import File, NinjaAPI, Router
+from ninja.errors import HttpError
 from ninja.files import UploadedFile
 from ninja.pagination import PageNumberPagination, paginate
 from pgvector.django import CosineDistance, L2Distance, MaxInnerProduct
@@ -21,7 +22,6 @@ from .schema import (
 from .tasks import get_hn_job_postings
 from .utils import get_embedding
 from .validators import DistanceValidator
-from ninja.errors import HttpError
 
 router = Router()
 
@@ -87,10 +87,9 @@ def get_jobs(
 
     closest_jobs = HNJobPosting.objects.filter(
         embedding__isnull=False,
-        # last 30 days 
-        # datetime.now() - timedelta(days=30) -> convert to epoch int
-
         time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp()
+    ).exclude(
+        display_text__icontains="Willing to relocate:"
     ).order_by(
         distance("embedding", embedding)
     )
@@ -100,9 +99,6 @@ def get_jobs(
     page_obj = paginator.get_page(page)
 
     closest_jobs = page_obj.object_list
-
-    print(closest_jobs)
-    print(len(closest_jobs))
 
     closest_jobs = [HNJobPostingSchemaOut.from_orm(job) for job in closest_jobs]
 

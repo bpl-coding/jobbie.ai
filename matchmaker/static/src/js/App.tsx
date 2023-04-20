@@ -1,4 +1,4 @@
-import { useState, CSSProperties } from "react";
+import { useState } from "react";
 
 import {
   useResumeViewsResumePdfToTextMutation,
@@ -6,14 +6,15 @@ import {
   useResumeViewsCreateResumeMutation,
 } from "./store/resumeApi";
 
-import "./App.css";
-import './index.css';
+// import "./App.css";
+// import './index.css';
 import React from "react";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm'
+
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import SkeletonLoader from "./components/SkeletonLoader";
+import { Accordion, Button, Tooltip } from "flowbite-react";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -137,69 +138,158 @@ function App() {
     }
   };
 
-  const dropZoneStyles: CSSProperties = {
-    border: dragging ? "2px dashed #000" : "2px solid #ccc",
-    backgroundColor: dragging ? "#ccc" : "transparent",
-    padding: "20px",
-    textAlign: "center",
-    cursor: "pointer",
-  };
-
   return (
-    <div className="container mx-auto dark:bg-slate-800">
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/4 flex justify-center">
-          <form>
-            <div
+    <div className="container mx-auto px-10 dark:bg-slate-800 ">
+
+      <div className="flex flex-col items-center justify-center w-full mt-20">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 ">
+          HN Resume to Jobs
+        </h1>
+      </div>
+
+      <div className="flex flex-col items-center justify-center w-full mb-14">
+        <h2 className="text-gray-900 dark:text-gray-100 ">
+          Find jobs most relevant to your resume
+        </h2>
+      </div>
+
+      <div className="flex items-end text-gray-900 mb-5">
+        <span className="text-2xl font-semibold">Step 1</span>
+        <Tooltip content="You can also copy/paste the contents of your resume">
+          <span className="text-xs text-gray-400 ml-1 mb-1">(Optional)</span>
+        </Tooltip>
+        <span className="text-lg font-semibold ml-2">- Convert your resume to text</span>
+      </div>
+
+      <div className="flex flex-row justify-center mb-5">
+
+        <div className="w-full md:w-1/4 flex">
+
+          <div className="flex items-center justify-center w-full">
+            <label
+              htmlFor="dropzone-file"
+              className="flex flex-col aspect-square items-center justify-center h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              style={dropZoneStyles}
             >
-              <div>
-                <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                  <FontAwesomeIcon icon={faPenToSquare} />
-                  {dragging ? "Drop file here" : "Select a file or drag and drop here"}
-                  {file && <p>Selected file: {file.name}</p>}
-                  {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+
+                <svg aria-hidden="true" className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  {dragging ? "Drop file here" : <span className="font-semibold">Click to upload or drag and drop</span>}
+
+                </p>
+                {file && <p className="text-xs text-gray-500 dark:text-gray-400">Selected file: {file.name}</p>}
+                {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+                <p className="text-xs text-gray-500 dark:text-gray-400">PDF (MAX. 2MB)</p>
               </div>
-            </div>
-          </form>
+              <input
+                id="dropzone-file"
+                type="file"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
         </div>
+      </div>
 
-        <div className="w-full md:w-3/4 flex justify-center">
+      <div className="flex items-end text-gray-900 mb-5">
+        <span className="text-2xl font-semibold">Step 2</span>
+        <span className="text-lg font-semibold ml-2">- Search for similar jobs to your resume</span>
+      </div>
 
-          <form onSubmit={handleResumeTextSubmit}>
-            <label htmlFor="resume-text" style={{ cursor: "pointer" }}>
+      <div className="flex flex-row">
+        <div className="w-full flex justify-center">
+          <form onSubmit={handleResumeTextSubmit} className="w-full h-full">
+            <label
+              htmlFor="resume-text"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Enter resume text
             </label>
             <textarea
               id="resume-text"
               name="resume-text"
-              // rows={30}
-              // cols={70}
-              value={resumeText}
+              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[500px]"
+              placeholder="Enter the text of your resume..."
               onChange={(e) => setResumeText(e.target.value)}
+              value={resumeText}
             />
-            <button type="submit">Upload Text</button>
-          </form>
 
+            <div className="flex justify-center mt-5">
+              <button
+                type="submit"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Search Jobs
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      <div className="job-list">
-        {getJobsData && getJobsData.jobs.map((job) => (
+      <Accordion collapseAll={true}>
+        <Accordion.Panel>
+          <Accordion.Title>
+            What is Flowbite?
+          </Accordion.Title>
+          <Accordion.Content>
+            <p className="mb-2 text-gray-500 dark:text-gray-400">
+              Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons, dropdowns, modals, navbars, and more.
+            </p>
+            <p className="text-gray-500 dark:text-gray-400">
+              Check out this guide to learn how to
+              <a
+                href="https://flowbite.com/docs/getting-started/introduction/"
+                className="text-blue-600 hover:underline dark:text-blue-500"
+              >
+                get started
+              </a>
+              and start developing websites even faster with components on top of Tailwind CSS.
+            </p>
+          </Accordion.Content>
+        </Accordion.Panel>
+      </Accordion>
+
+      {/* getJobsIsLoading */}
+      {/* getJobsError */}
+
+      {/* {getJobsIsLoading && <div className="flex justify-center mt-2"> */}
+
+      {/* <hr className="border-gray-300 dark:border-gray-600 my-10" />
+      <SkeletonLoader /> */}
+
+
+      {getJobsIsLoading && !getJobsError &&
+        <>
+          {[...Array(3)].map((_, index) => (
+            <div key={index}>
+              <hr className="border-gray-300 dark:border-gray-600 my-10" />
+              <SkeletonLoader />
+            </div>
+          ))}
+        </>
+      }
+
+
+      <div>
+        {!getJobsIsLoading && !getJobsError && getJobsData && getJobsData.jobs.map((job) => (
           <React.Fragment key={job.id}>
-            <hr className="thin-line" />
-            <div className="job-text">
-              <div dangerouslySetInnerHTML={{ __html: job.display_text }} />
+            <div>
+              <hr className="border-gray-300 dark:border-gray-600 my-10" />
+              <div className="px-10 pb-5">
+                <a href={"https://news.ycombinator.com/user?id=" + job.posted_by}
+                  className="text-xl underline text-sky-500">
+                  {job.posted_by}
+                </a>
+              </div>
+              <div
+                // className="overflow-wrap break-words max-w-full"
+                className="wrap-display-text text-xl max-w-full mx-10"
+                dangerouslySetInnerHTML={{ __html: job.display_text }}
+              />
             </div>
           </React.Fragment>
         ))}
@@ -207,71 +297,7 @@ function App() {
     </div>
 
 
-    // <div className="App">
 
-    //   <div className="content-wrapper">
-
-    //     <div className="left-side">
-
-    //       <form>
-
-    //         <div
-    //           onDragOver={handleDragOver}
-    //           onDragLeave={handleDragLeave}
-    //           onDrop={handleDrop}
-    //           style={dropZoneStyles}
-    //         >
-    //           <div>
-
-    //             <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-    //               <FontAwesomeIcon icon={faPenToSquare} />
-    //               {dragging ? "Drop file here" : "Select a file or drag and drop here"}
-    //               {file && <p>Selected file: {file.name}</p>}
-    //               {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
-    //             </label>
-
-    //             <input
-    //               id="file-upload"
-    //               type="file"
-    //               onChange={handleFileChange}
-    //               style={{ display: "none" }}
-    //             />
-    //           </div>
-
-    //         </div>
-
-    //       </form>
-    //     </div>
-
-    //     <div className="right-side">
-    //       <form onSubmit={handleResumeTextSubmit}>
-    //         <label htmlFor="resume-text" style={{ cursor: "pointer" }}>
-    //           Enter resume text
-    //         </label>
-    //         <textarea
-    //           id="resume-text"
-    //           name="resume-text"
-    //           rows={30}
-    //           cols={70}
-    //           value={resumeText}
-    //           onChange={(e) => setResumeText(e.target.value)}
-    //         />
-    //         <button type="submit">Upload Text</button>
-    //       </form>
-    //     </div>
-    //   </div>
-    //   <div className="job-list">
-    //     {getJobsData && getJobsData.jobs.map((job) => (
-    //       <React.Fragment key={job.id}>
-    //         <hr className="thin-line" />
-    //         <div className="job-text">
-    //           <div dangerouslySetInnerHTML={{ __html: job.display_text }} />
-    //         </div>
-    //       </React.Fragment>
-    //     ))}
-    //   </div>
-
-    // </div >
   );
 }
 
