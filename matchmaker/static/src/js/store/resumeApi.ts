@@ -71,6 +71,7 @@ export type HnJobPostingSchemaOut = {
   raw_text: string;
   display_text: string;
   embedding_text: string;
+  distance: number;
 };
 export type JobsOut = {
   jobs: HnJobPostingSchemaOut[];

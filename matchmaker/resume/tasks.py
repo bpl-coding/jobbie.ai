@@ -7,10 +7,7 @@ from functools import partial
 # from html_sanitizer import Sanitizer
 import nh3
 import openai
-import torch
-from bs4 import BeautifulSoup
 from django.db import IntegrityError
-from sentence_transformers import SentenceTransformer
 
 from matchmaker.celery import app
 
@@ -80,8 +77,8 @@ def get_hn_job_postings(month: str | int, year: int, update_posts=False, update_
         month = datetime.strptime(month, "%B").month
     
     # check if we've already indexed the job postings for this month/year
-    if not HNWhosHiringPost.objects.filter_by_month_year(month, year).exists():
-        index_job_postings(month, year)
+    # if not HNWhosHiringPost.objects.filter_by_month_year(month, year).exists():
+        # index_job_postings(month, year)
     
     # get the post for the month/year
     post = HNWhosHiringPost.objects.filter_by_month_year(month, year).first()

@@ -88,6 +88,8 @@ def get_jobs(
     closest_jobs = HNJobPosting.objects.filter(
         embedding__isnull=False,
         time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp()
+    ).annotate(
+        distance=distance("embedding", embedding)
     ).exclude(
         display_text__icontains="Willing to relocate:"
     ).order_by(

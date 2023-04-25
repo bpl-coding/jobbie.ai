@@ -15,6 +15,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { Accordion, Button, Tooltip } from "flowbite-react";
+import RadioForm from "./components/RadioForm";
+import ToggleSwitch from './components/ToggleSwitch';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -26,8 +28,8 @@ function App() {
   const [shouldFetchJobs, setShouldFetchJobs] = useState(false);
 
   const {
-    data: getJobsData,
-    error: getJobsError,
+    data: jobsData,
+    error: jobsError,
     isLoading: getJobsIsLoading,
     refetch,
   } = useResumeViewsGetJobsQuery(
@@ -61,6 +63,8 @@ function App() {
 
   const [resumeText, setResumeText] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [showDistance, setShowDistance] = useState(false);
 
   const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
@@ -137,6 +141,26 @@ function App() {
       handleFileChange({ target: { files: event.dataTransfer.files } });
     }
   };
+
+  const distanceFunctionOptions = [
+    {
+      id: "maxInnerProduct",
+      value: "maxInnerProduct",
+      label: "Max Inner Product",
+    },
+    {
+      id: "cosineDistance",
+      value: "cosine",
+      label: "Cosine Distance",
+    },
+    {
+      id: "euclideanDistance",
+      value: "l2",
+      label: "Euclidean Distance",
+    }
+  ];
+
+  console.log(distance)
 
   return (
     <div className="container mx-auto px-10 dark:bg-slate-800 ">
@@ -218,10 +242,28 @@ function App() {
               value={resumeText}
             />
 
+            <Accordion collapseAll={true} className="mt-5">
+              <Accordion.Panel>
+                <Accordion.Title>
+                  Advanced Options
+                </Accordion.Title>
+                <Accordion.Content>
+
+
+                  <ToggleSwitch isChecked={showDistance} setIsChecked={setShowDistance} label="Show Distance" />
+
+
+                  <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">Distance Function</h3>
+                  <RadioForm options={distanceFunctionOptions} value={distance} onChange={setDistance} />
+
+                </Accordion.Content>
+              </Accordion.Panel>
+            </Accordion>
+
             <div className="flex justify-center mt-5">
               <button
                 type="submit"
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 my-5"
               >
                 Search Jobs
               </button>
@@ -230,28 +272,7 @@ function App() {
         </div>
       </div>
 
-      <Accordion collapseAll={true}>
-        <Accordion.Panel>
-          <Accordion.Title>
-            What is Flowbite?
-          </Accordion.Title>
-          <Accordion.Content>
-            <p className="mb-2 text-gray-500 dark:text-gray-400">
-              Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons, dropdowns, modals, navbars, and more.
-            </p>
-            <p className="text-gray-500 dark:text-gray-400">
-              Check out this guide to learn how to
-              <a
-                href="https://flowbite.com/docs/getting-started/introduction/"
-                className="text-blue-600 hover:underline dark:text-blue-500"
-              >
-                get started
-              </a>
-              and start developing websites even faster with components on top of Tailwind CSS.
-            </p>
-          </Accordion.Content>
-        </Accordion.Panel>
-      </Accordion>
+
 
       {/* getJobsIsLoading */}
       {/* getJobsError */}
@@ -262,7 +283,7 @@ function App() {
       <SkeletonLoader /> */}
 
 
-      {getJobsIsLoading && !getJobsError &&
+      {getJobsIsLoading && !jobsError &&
         <>
           {[...Array(3)].map((_, index) => (
             <div key={index}>
@@ -275,16 +296,32 @@ function App() {
 
 
       <div>
-        {!getJobsIsLoading && !getJobsError && getJobsData && getJobsData.jobs.map((job) => (
+        {!getJobsIsLoading && !jobsError && jobsData && jobsData.jobs.map((job) => (
           <React.Fragment key={job.id}>
             <div>
               <hr className="border-gray-300 dark:border-gray-600 my-10" />
-              <div className="px-10 pb-5">
-                <a href={"https://news.ycombinator.com/user?id=" + job.posted_by}
-                  className="text-xl underline text-sky-500">
-                  {job.posted_by}
-                </a>
+              <div className="flex justify-between">
+                <div className="px-10 pb-5">
+                  <a href={"https://news.ycombinator.com/user?id=" + job.posted_by}
+                    className="text-xl underline text-sky-500">
+                    {job.posted_by}
+                  </a>
+                </div>
+
+                <div>
+                  <div className="px-10 pb-5">
+                    {showDistance &&
+                      <>
+                        <span className="font-semibold">Distance: </span>
+                        <span>{job.distance.toFixed(4)}</span>
+                      </>
+                    }
+                  </div>
+                </div>
               </div>
+
+
+
               <div
                 // className="overflow-wrap break-words max-w-full"
                 className="wrap-display-text text-xl max-w-full mx-10"
