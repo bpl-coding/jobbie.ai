@@ -1,29 +1,34 @@
 version: "3.9"
 
+x-shared-volumes:
+  &shared-volumes
+  volumes:
+    - ./matchmaker:/usr/src/app/matchmaker
+    - ./docker:/usr/src/app/docker
+
 services:
-  # celery-worker:
-  #     profiles:
-  #       - "worker"
-  #     restart: always
-  #     build:
-  #       context: .
-  #       dockerfile: docker/celery-worker/Dockerfile
-  #       args: 
-  #       - BUILDKIT_INLINE_CACHE=1
-  #     depends_on:
-  #       - postgres
-  #       - redis
-  #     environment:
-  #       - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
-  #       - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
-  #       - DJANGO_DATABASE_PASSWORD=${DJANGO_DATABASE_PASSWORD}
-  #       - DJANGO_DATABASE_HOST=${DJANGO_DATABASE_HOST}
-  #       - DJANGO_DATABASE_PORT=${DJANGO_DATABASE_PORT}
-  #       - DJANGO_DEBUG=${DJANGO_DEBUG}
-  #       - REDIS_URL=${WORKER_REDIS_URL}
-  #     networks:
-  #       - postgres
-  #       - redis
+  celery-worker:
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/celery-worker/Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
+      - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
+      - DJANGO_DATABASE_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+      - DJANGO_DATABASE_HOST=${DJANGO_DATABASE_HOST}
+      - DJANGO_DATABASE_PORT=${DJANGO_DATABASE_PORT}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - REDIS_URL=${REDIS_URL}
+    networks:
+      - postgres
+      - redis
+    <<: *shared-volumes
 
   postgres:
     container_name: postgres
@@ -41,18 +46,18 @@ services:
     networks:
       - postgres
     restart: unless-stopped
-  # redis:
-  #   image: "redis:alpine"
-  #   ports:
-  #     - "6379:6379"
-  #   networks:
-  #     - redis
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - redis
 
 networks:
   postgres:
     driver: bridge
-  # redis:
-  #   driver: bridge
+  redis:
+    driver: bridge
 
 volumes:
   postgres:
