@@ -30,9 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-&$9lc+^)#!&0p1*=ke91(7pgds*kmjmqljb#v0l-6s(&wndlv6"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:3000",
@@ -159,8 +160,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
     DIST_PATH,
     SRC_PATH,
-
-    # FRONTEND_DIR,
 ]
 
 
@@ -185,7 +184,6 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_ACKS_LATE = True
 CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
-
 
 
 

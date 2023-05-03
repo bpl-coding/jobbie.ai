@@ -22,6 +22,7 @@ const injectedRtkApi = api.injectEndpoints({
           page: queryArg.page,
           page_size: queryArg.pageSize,
           distance: queryArg.distance,
+          order_by: queryArg.orderBy,
         },
       }),
     }),
@@ -52,6 +53,7 @@ export type ResumeViewsGetJobsApiArg = {
   page?: number;
   pageSize?: number;
   distance?: string;
+  orderBy?: string;
 };
 export type ResumeViewsCreateResumeApiResponse =
   /** status 200 OK */ CreateResumeOut;

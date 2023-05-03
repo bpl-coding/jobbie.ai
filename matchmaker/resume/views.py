@@ -73,6 +73,7 @@ def get_jobs(
     page: int = 1,
     page_size: int = 10,
     distance: DistanceValidator = "cosine",
+    order_by: str = "ascending",
 ):
     distance_mapping = {
         "l2": L2Distance,
@@ -92,9 +93,17 @@ def get_jobs(
         distance=distance("embedding", embedding)
     ).exclude(
         display_text__icontains="Willing to relocate:"
-    ).order_by(
-        distance("embedding", embedding)
     )
+    
+    if order_by == "ascending":
+        closest_jobs = closest_jobs.order_by(
+            distance("embedding", embedding)
+        )
+    elif order_by == "descending":
+        closest_jobs = closest_jobs.order_by(
+            -distance("embedding", embedding)
+        )
+
 
     paginator = Paginator(closest_jobs, page_size)
 

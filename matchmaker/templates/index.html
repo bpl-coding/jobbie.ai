@@ -26,17 +26,7 @@
   {% vite_hmr_client %}
   {% endif %}
 
-  {% if not DEBUG %}
-  <!-- Google tag (gtag.js) -->
-  {% comment %} <script async src="https://www.googletagmanager.com/gtag/js?id=G-9TLEQWC9BY"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-9TLEQWC9BY');
-  </script> {% endcomment %}
-  {% endif%}
+  
 
 
   {% vite_asset 'js/main.tsx' %}

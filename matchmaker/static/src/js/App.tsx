@@ -10,9 +10,9 @@ import {
 // import './index.css';
 import React from "react";
 
+import OrderBy, { SortState } from "./components/OrderBy";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+
 import SkeletonLoader from "./components/SkeletonLoader";
 import { Accordion, Button, Tooltip } from "flowbite-react";
 import RadioForm from "./components/RadioForm";
@@ -25,6 +25,7 @@ function App() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [distance, setDistance] = useState("maxInnerProduct");
+  const [orderBy, setOrderBy] = useState<SortState>('ascending');
   const [shouldFetchJobs, setShouldFetchJobs] = useState(false);
 
   const {
@@ -33,7 +34,7 @@ function App() {
     isLoading: getJobsIsLoading,
     refetch,
   } = useResumeViewsGetJobsQuery(
-    { resumeId, page, pageSize, distance },
+    { resumeId, page, pageSize, distance, orderBy: orderBy.toString() },
     { skip: resumeId === -1 || !shouldFetchJobs }
   );
 
@@ -60,6 +61,7 @@ function App() {
   ] = useResumeViewsCreateResumeMutation();
 
   const [file, setFile] = useState(null);
+
 
   const [resumeText, setResumeText] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -269,18 +271,16 @@ function App() {
               </button>
             </div>
           </form>
+
         </div>
       </div>
 
 
 
-      {/* getJobsIsLoading */}
-      {/* getJobsError */}
 
-      {/* {getJobsIsLoading && <div className="flex justify-center mt-2"> */}
-
-      {/* <hr className="border-gray-300 dark:border-gray-600 my-10" />
-      <SkeletonLoader /> */}
+      <div className="flex justify-end">
+        <OrderBy sortState={[orderBy, setOrderBy]} />
+      </div>
 
 
       {getJobsIsLoading && !jobsError &&
