@@ -104,6 +104,7 @@ def get_jobs(
             -distance("embedding", embedding)
         )
 
+    total_jobs = closest_jobs.count()
 
     paginator = Paginator(closest_jobs, page_size)
 
@@ -113,7 +114,7 @@ def get_jobs(
 
     closest_jobs = [HNJobPostingSchemaOut.from_orm(job) for job in closest_jobs]
 
-    return {"jobs": closest_jobs}
+    return {"jobs": closest_jobs, "total_jobs": total_jobs}
 
 
 @router.post(

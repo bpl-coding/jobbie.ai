@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { scroller } from 'react-scroll';
 
 import {
   useResumeViewsResumePdfToTextMutation,
@@ -6,24 +7,23 @@ import {
   useResumeViewsCreateResumeMutation,
 } from "./store/resumeApi";
 
-// import "./App.css";
-// import './index.css';
 import React from "react";
 
 import OrderBy, { SortState } from "./components/OrderBy";
 
-
+import { Link, Element } from 'react-scroll';
 import SkeletonLoader from "./components/SkeletonLoader";
 import { Accordion, Button, Tooltip } from "flowbite-react";
 import RadioForm from "./components/RadioForm";
 import ToggleSwitch from './components/ToggleSwitch';
+import Paginator from "./components/Paginator";
 
 function App() {
   const [count, setCount] = useState(0);
 
   const [resumeId, setResumeId] = useState(-1);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(10);
   const [distance, setDistance] = useState("maxInnerProduct");
   const [orderBy, setOrderBy] = useState<SortState>('ascending');
   const [shouldFetchJobs, setShouldFetchJobs] = useState(false);
@@ -32,6 +32,7 @@ function App() {
     data: jobsData,
     error: jobsError,
     isLoading: getJobsIsLoading,
+    isFetching: getJobsIsFetching,
     refetch,
   } = useResumeViewsGetJobsQuery(
     { resumeId, page, pageSize, distance, orderBy: orderBy.toString() },
@@ -119,6 +120,8 @@ function App() {
     // Fetch jobs after the resume is created
     setShouldFetchJobs(true);
 
+    scrollToSkeletonLoader();
+
   };
   const [dragging, setDragging] = useState(false);
 
@@ -144,6 +147,15 @@ function App() {
     }
   };
 
+  const scrollToSkeletonLoader = () => {
+    scroller.scrollTo('skeletonLoader', {
+      duration: 500, // Duration of the scroll animation in milliseconds
+      smooth: true, // Enable smooth scrolling
+      offset: -10, // Offset from the element's top position (optional)
+    });
+  };
+
+
   const distanceFunctionOptions = [
     {
       id: "maxInnerProduct",
@@ -162,8 +174,8 @@ function App() {
     }
   ];
 
-  console.log(distance)
-
+  console.log(page)
+  console.log(jobsData?.total_jobs)
   return (
     <div className="container mx-auto px-10 dark:bg-slate-800 ">
 
@@ -263,12 +275,15 @@ function App() {
             </Accordion>
 
             <div className="flex justify-center mt-5">
+
               <button
                 type="submit"
                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 my-5"
+                onClick={() => { scrollToSkeletonLoader() }}
               >
                 Search Jobs
               </button>
+
             </div>
           </form>
 
@@ -279,20 +294,23 @@ function App() {
 
 
       <div className="flex justify-end">
-        <OrderBy sortState={[orderBy, setOrderBy]} />
+        <OrderBy sortState={[orderBy, setOrderBy]} onSortChange={() => { setPage(1) }} />
       </div>
 
+      <Element name="skeletonLoader">
+        {(getJobsIsLoading || getJobsIsFetching) && !jobsError &&
+          <>
+            {[...Array(3)].map((_, index) => (
+              <div key={index}>
+                <hr className="border-gray-300 dark:border-gray-600 my-10" />
+                <SkeletonLoader />
+              </div>
+            ))}
+            <div className="mb-28"></div>
+          </>
+        }
+      </Element>
 
-      {getJobsIsLoading && !jobsError &&
-        <>
-          {[...Array(3)].map((_, index) => (
-            <div key={index}>
-              <hr className="border-gray-300 dark:border-gray-600 my-10" />
-              <SkeletonLoader />
-            </div>
-          ))}
-        </>
-      }
 
 
       <div>
@@ -319,17 +337,20 @@ function App() {
                   </div>
                 </div>
               </div>
-
-
-
               <div
-                // className="overflow-wrap break-words max-w-full"
                 className="wrap-display-text text-xl max-w-full mx-10"
                 dangerouslySetInnerHTML={{ __html: job.display_text }}
               />
             </div>
           </React.Fragment>
+
         ))}
+        {!getJobsIsLoading && !jobsError && jobsData &&
+          <div className="py-16">
+            <Paginator page={page} setPage={setPage} pageSize={pageSize} totalJobs={jobsData.total_jobs} />
+          </div>
+        }
+
       </div>
     </div>
 

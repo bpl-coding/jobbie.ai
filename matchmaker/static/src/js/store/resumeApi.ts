@@ -77,6 +77,7 @@ export type HnJobPostingSchemaOut = {
 };
 export type JobsOut = {
   jobs: HnJobPostingSchemaOut[];
+  total_jobs: number;
 };
 export type CreateResumeOut = {
   id: number;

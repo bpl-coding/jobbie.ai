@@ -21,6 +21,7 @@ class HNJobPostingSchemaOut(ModelSchema):
 
 class JobsOut(Schema):
     jobs: list[HNJobPostingSchemaOut]
+    total_jobs: int
 
 class CreateResumeIn(Schema):
     text: str
