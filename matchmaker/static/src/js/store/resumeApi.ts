@@ -36,6 +36,12 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.createResumeIn,
       }),
     }),
+    resumeViewsGetResume: build.query<
+      ResumeViewsGetResumeApiResponse,
+      ResumeViewsGetResumeApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/resume/${queryArg.resumeId}` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -59,6 +65,10 @@ export type ResumeViewsCreateResumeApiResponse =
   /** status 200 OK */ CreateResumeOut;
 export type ResumeViewsCreateResumeApiArg = {
   createResumeIn: CreateResumeIn;
+};
+export type ResumeViewsGetResumeApiResponse = /** status 200 OK */ ResumeOut;
+export type ResumeViewsGetResumeApiArg = {
+  resumeId: number;
 };
 export type UploadResumeOut = {
   text: string;
@@ -85,8 +95,13 @@ export type CreateResumeOut = {
 export type CreateResumeIn = {
   text: string;
 };
+export type ResumeOut = {
+  id: number;
+  text: string;
+};
 export const {
   useResumeViewsResumePdfToTextMutation,
   useResumeViewsGetJobsQuery,
   useResumeViewsCreateResumeMutation,
+  useResumeViewsGetResumeQuery,
 } = injectedRtkApi;

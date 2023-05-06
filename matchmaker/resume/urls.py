@@ -4,6 +4,7 @@ from ninja import NinjaAPI
 
 from .views import router
 
+
 if settings.DEBUG:
     api = NinjaAPI()
 else:

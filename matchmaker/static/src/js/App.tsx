@@ -5,28 +5,49 @@ import {
   useResumeViewsResumePdfToTextMutation,
   useResumeViewsGetJobsQuery,
   useResumeViewsCreateResumeMutation,
+  useResumeViewsGetResumeQuery,
 } from "./store/resumeApi";
+import { useSearchParams } from "react-router-dom";
 
-import React from "react";
-
+import React, { useEffect } from "react";
 import OrderBy, { SortState } from "./components/OrderBy";
 
-import { Link, Element } from 'react-scroll';
+import { Element } from 'react-scroll';
 import SkeletonLoader from "./components/SkeletonLoader";
-import { Accordion, Button, Tooltip } from "flowbite-react";
+import { Accordion, Tooltip } from "flowbite-react";
 import RadioForm from "./components/RadioForm";
 import ToggleSwitch from './components/ToggleSwitch';
 import Paginator from "./components/Paginator";
 
 function App() {
-  const [count, setCount] = useState(0);
 
-  const [resumeId, setResumeId] = useState(-1);
+  // Get the search parameters from the URL
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize the state variables using the values from the URL search parameters
+  const initialResumeId = parseInt(searchParams.get("resumeId") || "-1", 10);
+
+  const [resumeId, setResumeId] = useState(initialResumeId);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [distance, setDistance] = useState("maxInnerProduct");
-  const [orderBy, setOrderBy] = useState<SortState>('ascending');
-  const [shouldFetchJobs, setShouldFetchJobs] = useState(false);
+  const [distance, setDistance] = useState('cosine');
+  const [orderBy, setOrderBy] = useState<SortState>('descending');
+  const [shouldFetchJobs, setShouldFetchJobs] = useState(initialResumeId !== -1);
+  const [resumeText, setResumeText] = useState<string>("");
+
+  const {
+    data: resumeData, // The data returned by the query
+    error: resumeError, // Any error that occurred while fetching the data
+    isLoading: getResumeIsLoading, // Whether the query is currently loading
+    isFetching: getResumeIsFetching, // Whether the query is currently fetching in the background
+  } = useResumeViewsGetResumeQuery(
+    { resumeId }, // Pass the resumeId as a parameter to the query
+    { skip: resumeId === -1 } // Optionally, skip the query if resumeId is -1
+  );
+
+  useEffect(() => {
+    setResumeText(resumeData?.text || "");
+  }, [resumeData])
 
   const {
     data: jobsData,
@@ -63,8 +84,6 @@ function App() {
 
   const [file, setFile] = useState(null);
 
-
-  const [resumeText, setResumeText] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const [showDistance, setShowDistance] = useState(false);
@@ -116,6 +135,8 @@ function App() {
     const resumeId = response.data.id;
 
     setResumeId(resumeId);
+
+    setSearchParams({ resumeId: resumeId.toString() }, { replace: true });
 
     // Fetch jobs after the resume is created
     setShouldFetchJobs(true);
@@ -174,8 +195,6 @@ function App() {
     }
   ];
 
-  console.log(page)
-  console.log(jobsData?.total_jobs)
   return (
     <div className="container mx-auto px-10 dark:bg-slate-800 ">
 
@@ -191,18 +210,22 @@ function App() {
         </h2>
       </div>
 
-      <div className="flex items-end text-gray-900 mb-5">
-        <span className="text-2xl font-semibold">Step 1</span>
-        <Tooltip content="You can also copy/paste the contents of your resume">
-          <span className="text-xs text-gray-400 ml-1 mb-1">(Optional)</span>
-        </Tooltip>
-        <span className="text-lg font-semibold ml-2">- Convert your resume to text</span>
-      </div>
+      <Tooltip content="You can also copy/paste the contents of your resume">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mb-3">
+          <div className="flex items-center mb-1 sm:mb-0">
+            <span className="text-xl sm:text-2xl font-semibold">Step 1</span>
+
+            <span className="text-xs text-gray-400 ml-1">(Optional)</span>
+
+          </div>
+          <span className="text-md sm:text-lg font-semibold ml-0 sm:ml-2 mt-1 sm:mt-0">
+            <span className="hidden sm:inline">- </span>Convert your resume to text
+          </span>
+        </div>
+      </Tooltip>
 
       <div className="flex flex-row justify-center mb-5">
-
         <div className="w-full md:w-1/4 flex">
-
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="dropzone-file"
@@ -230,14 +253,16 @@ function App() {
               />
             </label>
           </div>
-
         </div>
       </div>
 
-      <div className="flex items-end text-gray-900 mb-5">
-        <span className="text-2xl font-semibold">Step 2</span>
-        <span className="text-lg font-semibold ml-2">- Search for similar jobs to your resume</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mb-3">
+        <span className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-0">Step 2</span>
+        <span className="text-md sm:text-lg font-semibold ml-0 sm:ml-2 mt-1 sm:mt-0">
+          <span className="hidden sm:inline">- </span>Search for similar jobs to your resume
+        </span>
       </div>
+
 
       <div className="flex flex-row">
         <div className="w-full flex justify-center">
@@ -263,9 +288,7 @@ function App() {
                 </Accordion.Title>
                 <Accordion.Content>
 
-
                   <ToggleSwitch isChecked={showDistance} setIsChecked={setShowDistance} label="Show Distance" />
-
 
                   <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">Distance Function</h3>
                   <RadioForm options={distanceFunctionOptions} value={distance} onChange={setDistance} />
@@ -290,9 +313,6 @@ function App() {
         </div>
       </div>
 
-
-
-
       <div className="flex justify-end">
         <OrderBy sortState={[orderBy, setOrderBy]} onSortChange={() => { setPage(1) }} />
       </div>
@@ -310,8 +330,6 @@ function App() {
           </>
         }
       </Element>
-
-
 
       <div>
         {!getJobsIsLoading && !jobsError && jobsData && jobsData.jobs.map((job) => (
@@ -350,15 +368,10 @@ function App() {
             <Paginator page={page} setPage={setPage} pageSize={pageSize} totalJobs={jobsData.total_jobs} />
           </div>
         }
-
       </div>
     </div>
-
-
-
   );
 }
-
 
 export default App;
 

@@ -12,6 +12,11 @@ class HNJobPostingAdmin(admin.ModelAdmin):
    exclude = ['embedding']
 
 
+class ResumeAdmin(admin.ModelAdmin):
+   model = Resume
+   exclude = ['embedding']
+
+
 admin.site.register(HNJobPosting, HNJobPostingAdmin)
 admin.site.register(HNWhosHiringPost)
-admin.site.register(Resume)
+admin.site.register(Resume, ResumeAdmin)

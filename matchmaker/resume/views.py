@@ -17,6 +17,7 @@ from .schema import (
     CreateResumeOut,
     HNJobPostingSchemaOut,
     JobsOut,
+    ResumeOut,
     UploadResumeOut,
 )
 from .tasks import get_hn_job_postings
@@ -26,31 +27,25 @@ from .validators import DistanceValidator
 router = Router()
 
 
-@router.post(
-    "resume/upload",
-    tags=["resume"],
-    response=UploadResumeOut
-)
+@router.post("resume/upload", tags=["resume"], response=UploadResumeOut)
 def resume_pdf_to_text(request, file: UploadedFile = File(...)):
-
     # Reject files larger than 2MB
     max_file_size = 2 * 1024 * 1024  # 2MB in bytes
     if file.size > max_file_size:
         raise HttpError(413, "File size should not exceed 2MB")
-        
+
     # Reject files that are not PDFs
     if file.content_type != "application/pdf":
         raise HttpError(415, "File must be a PDF")
-
 
     pdf_buffer = NamedTemporaryFile(suffix=".pdf")
     pdf_buffer.write(file.read())
 
     txt_buffer = NamedTemporaryFile(suffix=".txt")
 
-    subprocess.run(['pdftotext', pdf_buffer.name, txt_buffer.name], check=True)
+    subprocess.run(["pdftotext", pdf_buffer.name, txt_buffer.name], check=True)
 
-    with open(txt_buffer.name, "r", encoding='utf-8', errors='replace') as f:
+    with open(txt_buffer.name, "r", encoding="utf-8", errors="replace") as f:
         text = f.read()
 
     pdf_buffer.close()
@@ -78,31 +73,27 @@ def get_jobs(
     distance_mapping = {
         "l2": L2Distance,
         "cosine": CosineDistance,
-        "maxInnerProduct": MaxInnerProduct
+        "maxInnerProduct": MaxInnerProduct,
     }
 
     distance = distance_mapping[distance]
 
-    resume = get_object_or_404(Resume, id=resume_id)
+    resume = get_object_or_404(Resume, hash=resume_id)
     embedding = resume.embedding
 
-    closest_jobs = HNJobPosting.objects.filter(
-        embedding__isnull=False,
-        time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp()
-    ).annotate(
-        distance=distance("embedding", embedding)
-    ).exclude(
-        display_text__icontains="Willing to relocate:"
+    closest_jobs = (
+        HNJobPosting.objects.filter(
+            embedding__isnull=False,
+            time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp(),
+        )
+        .annotate(distance=distance("embedding", embedding))
+        .exclude(display_text__icontains="Willing to relocate:")
     )
-    
+
     if order_by == "ascending":
-        closest_jobs = closest_jobs.order_by(
-            distance("embedding", embedding)
-        )
+        closest_jobs = closest_jobs.order_by(distance("embedding", embedding))
     elif order_by == "descending":
-        closest_jobs = closest_jobs.order_by(
-            -distance("embedding", embedding)
-        )
+        closest_jobs = closest_jobs.order_by(-distance("embedding", embedding))
 
     total_jobs = closest_jobs.count()
 
@@ -120,8 +111,6 @@ def get_jobs(
 @router.post(
     "/resume",
     tags=["resume"],
-    # response=MatchJobsOut,
-    # response=list[HNJobPostingSchema],
     response=CreateResumeOut,
 )
 def create_resume(request, resume: CreateResumeIn):
@@ -130,54 +119,19 @@ def create_resume(request, resume: CreateResumeIn):
 
     hash = mmh3.hash(resume_text, signed=False)
 
-    print(hash)
-
     if Resume.objects.filter(hash=hash).exists():
         resume = Resume.objects.get(hash=hash)
     else:
         resume = Resume.objects.create(text=resume_text, embedding=embedding, hash=hash)
         resume.save()
 
-    return {"id": resume.id}
+    return {"id": resume.hash}
 
-    # closest_jobs = HNJobPosting.objects.filter(
-    #     embedding__isnull=False
-    # ).order_by(
-    #     CosineDistance("embedding", embedding)
-    # )
-
-    # paginator = Paginator(closest_jobs, page_size)
-
-    # page_obj = paginator.get_page(page)
-
-    # closest_jobs = page_obj.object_list
-
-    # print(closest_jobs)
-    # print(len(closest_jobs))
-
-    # closest_jobs = [HNJobPostingSchema.from_orm(job) for job in closest_jobs]
-
-    # return closest_jobs
-
-    # closest_jobs = HNJobPosting.objects.filter(
-    #     embedding__isnull=False
-    # ).order_by(
-    #     CosineDistance("embedding", embedding)
-    # )[:10]
-
-    # convert to schema
-    # HNJobPostingSchema
-    # closest_jobs = [HNJobPostingSchema(**dict(job)) for job in closest_jobs] this is not working
-    # print(closest_jobs)
-    # for job in closest_jobs:
-    # print(job.whos_hiring_post)
-    # print(dict(job))
-    # print django model object as dict without using __dict__
-
-    # print(job.__dict__)
-
-    # closest_jobs = [HNJobPostingSchema.from_orm(job) for job in closest_jobs]
-
-    # return {
-    #     'jobs': closest_jobs
-    # }
+@router.get(
+    '/resume/{resume_id}',
+    tags=['resume'],
+    response=ResumeOut
+)
+def get_resume(request, resume_id: int):
+    resume = get_object_or_404(Resume, hash=resume_id)
+    return ResumeOut(id=resume.hash, text=resume.text)

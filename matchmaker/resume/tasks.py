@@ -7,6 +7,7 @@ from functools import partial
 # from html_sanitizer import Sanitizer
 import nh3
 import openai
+from bs4 import BeautifulSoup
 from django.db import IntegrityError
 
 from matchmaker.celery import app
@@ -154,26 +155,7 @@ def fetch_comments_from_story(comment_ids:list[str])->list[dict]:
     return comments
 
 
-# def create_job_postings_from_comments(post: HNWhosHiringPost, comments: list[dict])->list[HNJobPosting]:
-#     job_postings = []
 
-#     for comment in comments:
-#         if comment and not comment.get("dead") and not comment.get("deleted"):
-#             # try:
-#             job_posting = HNJobPosting.objects.update_or_create(
-#                 whos_hiring_post=post,
-#                 posted_by=comment["by"],
-#                 hn_id=comment["id"],
-#                 raw_text=comment["text"],
-#                 display_text=nh3.clean(comment["text"]),
-#                 embedding_text=clean_text(comment["text"]),
-#                 time_posted=comment["time"],
-#             )
-#             # except IntegrityError:
-#             #     continue
-#             job_postings.append(job_posting)
-
-#     return job_postings
 
 def create_job_postings_from_comments(post: HNWhosHiringPost, comments: list[dict])->list[HNJobPosting]:
     job_postings = []

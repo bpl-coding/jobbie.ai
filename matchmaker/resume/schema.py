@@ -31,3 +31,7 @@ class CreateResumeOut(Schema):
 
 class UploadResumeOut(Schema):
     text: str
+
+class ResumeOut(Schema):
+    id: int
+    text: str

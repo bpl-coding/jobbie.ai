@@ -1,12 +1,14 @@
+import uuid
 from datetime import datetime
 
 from django.db import models
-from pgvector.django import IvfflatIndex, VectorField
-
-# Create your models here.
+from pgvector.django import VectorField
 
 
 class Resume(models.Model):
+    class Meta:
+        app_label = 'resume'
+
     text = models.TextField()
     hash = models.PositiveBigIntegerField()
     embedding = VectorField(dimensions=1536, null=True, blank=True)
@@ -15,6 +17,9 @@ class Resume(models.Model):
 
 
 class HNJobPosting(models.Model):
+    class Meta:
+        app_label = 'resume'
+
     whos_hiring_post = models.ForeignKey('HNWhosHiringPost', on_delete=models.PROTECT)
     hn_id = models.IntegerField(unique=True)
     posted_by = models.CharField(max_length=200)
@@ -26,16 +31,6 @@ class HNJobPosting(models.Model):
     raw_text = models.TextField()
     display_text = models.TextField()
     embedding_text = models.TextField()
-
-    # class Meta:
-    #     indexes = [
-    #         IvfflatIndex(
-    #             name='hnjobposting_embedding_idx',
-    #             fields=['embedding'],
-    #             lists=250,
-    #             opclasses=['vector_cosine_ops']
-    #         )
-    #     ]
 
 
 class HNWhosHiringPostManager(models.Manager):
@@ -61,6 +56,10 @@ class HNWhosHiringPostManager(models.Manager):
 
 
 class HNWhosHiringPost(models.Model):
+
+    class Meta:
+        app_label = 'resume'
+
     hn_id = models.IntegerField(unique=True)
     date = models.DateField()
 

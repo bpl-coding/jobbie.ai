@@ -13,4 +13,3 @@ DATABASES = {
         "PORT": os.environ.get("DJANGO_DATABASE_PORT"),
     }
 }
-
