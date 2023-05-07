@@ -215,7 +215,7 @@ function App() {
   ];
 
   return (
-    <div className="container mx-auto px-10 dark:bg-slate-800 ">
+    <div className="container mx-auto px-10 dark:bg-slate-800">
 
       <div className="flex flex-col items-center justify-center w-full mt-20">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 ">
@@ -228,7 +228,7 @@ function App() {
           Find jobs most relevant to your resume for
         </h2>
 
-        <select onChange={handleSelectChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <select onChange={handleSelectChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block py-0.5 px-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
 
           {HIRING_POSTS.map((post) => (
             <option key={post.slug} value={`${post.month}-${post.year}`} selected={post.slug === selectedSlug}>
@@ -237,14 +237,13 @@ function App() {
           ))}
         </select>
 
-
       </div>
 
 
 
 
       <Tooltip content="You can also copy/paste the contents of your resume">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mb-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mt-10 mb-3">
           <div className="flex items-center mb-1 sm:mb-0">
             <span className="text-xl sm:text-2xl font-semibold">Step 1</span>
 
