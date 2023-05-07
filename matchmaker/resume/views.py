@@ -15,6 +15,8 @@ from .models import HNJobPosting, HNWhosHiringPost, Resume
 from .schema import (
     CreateResumeIn,
     CreateResumeOut,
+    HiringPostOut,
+    HiringPostOutList,
     HNJobPostingSchemaOut,
     JobsOut,
     ResumeOut,
@@ -65,6 +67,8 @@ def resume_pdf_to_text(request, file: UploadedFile = File(...)):
 def get_jobs(
     request,
     resume_id: int,
+    month: str,
+    year: int, 
     page: int = 1,
     page_size: int = 10,
     distance: DistanceValidator = "cosine",
@@ -81,10 +85,12 @@ def get_jobs(
     resume = get_object_or_404(Resume, hash=resume_id)
     embedding = resume.embedding
 
+    hiring_post = HNWhosHiringPost.objects.filter_by_month_year(month=month, year=year).first()
+
     closest_jobs = (
         HNJobPosting.objects.filter(
             embedding__isnull=False,
-            time_posted__gt=(datetime.now() - timedelta(days=30)).timestamp(),
+            whos_hiring_post=hiring_post,
         )
         .annotate(distance=distance("embedding", embedding))
         .exclude(display_text__icontains="Willing to relocate:")
@@ -127,11 +133,8 @@ def create_resume(request, resume: CreateResumeIn):
 
     return {"id": resume.hash}
 
-@router.get(
-    '/resume/{resume_id}',
-    tags=['resume'],
-    response=ResumeOut
-)
+
+@router.get("/resume/{resume_id}", tags=["resume"], response=ResumeOut)
 def get_resume(request, resume_id: int):
     resume = get_object_or_404(Resume, hash=resume_id)
     return ResumeOut(id=resume.hash, text=resume.text)

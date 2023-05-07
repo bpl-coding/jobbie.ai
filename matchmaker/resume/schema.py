@@ -35,3 +35,11 @@ class UploadResumeOut(Schema):
 class ResumeOut(Schema):
     id: int
     text: str
+
+class HiringPostOut(Schema):
+    month: str
+    year: int
+    slug: str
+
+class HiringPostOutList(Schema):
+    hiring_posts: list[HiringPostOut]

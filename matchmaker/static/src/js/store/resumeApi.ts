@@ -19,6 +19,8 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/jobs`,
         params: {
           resume_id: queryArg.resumeId,
+          month: queryArg.month,
+          year: queryArg.year,
           page: queryArg.page,
           page_size: queryArg.pageSize,
           distance: queryArg.distance,
@@ -56,6 +58,8 @@ export type ResumeViewsResumePdfToTextApiArg = {
 export type ResumeViewsGetJobsApiResponse = /** status 200 OK */ JobsOut;
 export type ResumeViewsGetJobsApiArg = {
   resumeId: number;
+  month: string;
+  year: number;
   page?: number;
   pageSize?: number;
   distance?: string;
