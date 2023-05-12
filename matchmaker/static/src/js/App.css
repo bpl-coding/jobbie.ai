@@ -1,35 +1,6 @@
-/* #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+pre,
+code {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
 }
-
-
-
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-} */
-
-/* //////////////////////////////////////////////////////////////////////// */
-
-/* .job-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.job-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.thin-line {
-  border: none;
-  border-top: 1px solid #ccc;
-  margin: 1em 0;
-} */

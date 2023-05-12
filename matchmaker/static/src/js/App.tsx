@@ -12,12 +12,16 @@ import { useSearchParams } from "react-router-dom";
 import React, { useEffect } from "react";
 import OrderBy, { SortState } from "./components/OrderBy";
 
+import './App.css';
+
 import { Element } from 'react-scroll';
 import SkeletonLoader from "./components/SkeletonLoader";
 import { Accordion, Tooltip } from "flowbite-react";
 import RadioForm from "./components/RadioForm";
 import ToggleSwitch from './components/ToggleSwitch';
 import Paginator from "./components/Paginator";
+import FileUpload from "./components/FileUpload";
+import JobPost from "./components/JobPost";
 
 type HiringPostTime = {
   month: string;
@@ -163,29 +167,6 @@ function App() {
     scrollToSkeletonLoader();
 
   };
-  const [dragging, setDragging] = useState(false);
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragging(true);
-  };
-
-  const handleDragLeave = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragging(false);
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragging(false);
-
-    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      handleFileChange({ target: { files: event.dataTransfer.files } });
-    }
-  };
 
   const scrollToSkeletonLoader = () => {
     scroller.scrollTo('skeletonLoader', {
@@ -240,8 +221,6 @@ function App() {
       </div>
 
 
-
-
       <Tooltip content="You can also copy/paste the contents of your resume">
         <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mt-10 mb-3">
           <div className="flex items-center mb-1 sm:mb-0">
@@ -256,37 +235,12 @@ function App() {
         </div>
       </Tooltip>
 
-      <div className="flex flex-row justify-center mb-5">
-        <div className="w-full md:w-1/4 flex">
-          <div className="flex items-center justify-center w-full">
-            <label
-              htmlFor="dropzone-file"
-              className="flex flex-col aspect-square items-center justify-center h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
 
-                <svg aria-hidden="true" className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                  {dragging ? "Drop file here" : <span className="font-semibold">Click to upload or drag and drop</span>}
-
-                </p>
-                {file && <p className="text-xs text-gray-500 dark:text-gray-400">Selected file: {file.name}</p>}
-                {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
-                <p className="text-xs text-gray-500 dark:text-gray-400">PDF (MAX. 2MB)</p>
-              </div>
-              <input
-                id="dropzone-file"
-                type="file"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </label>
-          </div>
-        </div>
-      </div>
+      <FileUpload
+        file={file}
+        onFileChange={handleFileChange}
+        errorMsg={errorMsg}
+      />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mb-3">
         <span className="text-xl sm:text-2xl font-semibold mb-1 sm:mb-0">Step 2</span>
@@ -365,36 +319,9 @@ function App() {
 
       <div>
         {!getJobsIsLoading && !jobsError && jobsData && jobsData.jobs.map((job) => (
-          <React.Fragment key={job.id}>
-            <div>
-              <hr className="border-gray-300 dark:border-gray-600 my-10" />
-              <div className="flex justify-between">
-                <div className="px-10 pb-5">
-                  <a href={"https://news.ycombinator.com/user?id=" + job.posted_by}
-                    className="text-xl underline text-sky-500">
-                    {job.posted_by}
-                  </a>
-                </div>
-
-                <div>
-                  <div className="px-10 pb-5">
-                    {showDistance &&
-                      <>
-                        <span className="font-semibold">Distance: </span>
-                        <span>{job.distance.toFixed(4)}</span>
-                      </>
-                    }
-                  </div>
-                </div>
-              </div>
-              <div
-                className="wrap-display-text text-xl max-w-full mx-10"
-                dangerouslySetInnerHTML={{ __html: job.display_text }}
-              />
-            </div>
-          </React.Fragment>
-
+          <JobPost job={job} showDistance={showDistance} />
         ))}
+
         {!getJobsIsLoading && !jobsError && jobsData &&
           <div className="py-16">
             <Paginator page={page} setPage={setPage} pageSize={pageSize} totalJobs={jobsData.total_jobs} />
