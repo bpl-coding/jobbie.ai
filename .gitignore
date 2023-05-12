@@ -1,3 +1,4 @@
+matchmaker/collectedstatic/
 .env*
 .env.dev
 .env.development

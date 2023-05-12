@@ -7,6 +7,33 @@ x-shared-volumes:
     - ./docker:/usr/src/app/docker
 
 services:
+  django:
+    container_name: django
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/django/Dockerfile
+      args: 
+       - BUILDKIT_INLINE_CACHE=1
+    depends_on:
+      - postgres
+    environment:
+      - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
+      - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
+      - DJANGO_DATABASE_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+      - DJANGO_DATABASE_HOST=${DJANGO_DATABASE_HOST}
+      - DJANGO_DATABASE_PORT=${DJANGO_DATABASE_PORT}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - VITE_API_BASE_URI=${VITE_API_BASE_URI}
+      - REDIS_URL=${REDIS_URL}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    networks:
+      - postgres
+      - redis
+    ports:
+      - "8888:8888"
+    <<: *shared-volumes
+
   celery-worker:
     restart: always
     build:
@@ -25,6 +52,7 @@ services:
       - DJANGO_DATABASE_PORT=${DJANGO_DATABASE_PORT}
       - DJANGO_DEBUG=${DJANGO_DEBUG}
       - REDIS_URL=${REDIS_URL}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
     networks:
       - postgres
       - redis
