@@ -1,3 +1,4 @@
+import string
 import subprocess
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
@@ -29,6 +30,7 @@ from .validators import DistanceValidator
 router = Router()
 
 
+
 @router.post("resume/upload", tags=["resume"], response=UploadResumeOut)
 def resume_pdf_to_text(request, file: UploadedFile = File(...)):
     # Reject files larger than 2MB
@@ -49,6 +51,9 @@ def resume_pdf_to_text(request, file: UploadedFile = File(...)):
 
     with open(txt_buffer.name, "r", encoding="utf-8", errors="replace") as f:
         text = f.read()
+
+    # Remove non-printable characters
+    text = ''.join(filter(lambda x: x in string.printable and x != '\f', text))
 
     pdf_buffer.close()
     txt_buffer.close()

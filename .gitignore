@@ -4,12 +4,10 @@ matchmaker/collectedstatic/
 .env.development
 .env.production
 
-django/podscription-project/collectedstatic/
 **/staticfiles/**
 **/dist/**
 
 .data/
-django/podscription-project/staticfiles
 django/data
 airflow/logs/
 

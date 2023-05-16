@@ -299,7 +299,8 @@ function App() {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <p className="text-lg text-gray-900 dark:text-gray-100">{jobsData.total_jobs} jobs found</p>
         <OrderBy sortState={[orderBy, setOrderBy]} onSortChange={() => { setPage(1) }} />
       </div>
 

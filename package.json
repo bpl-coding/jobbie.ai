@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "APP_ENV=development vite",
+    "build": "APP_ENV=production tsc && vite build",
     "preview": "vite preview",
     "api-generate": "npx @rtk-query/codegen-openapi openapi-config.ts"
   },

@@ -27,12 +27,14 @@ services:
       - VITE_API_BASE_URI=${VITE_API_BASE_URI}
       - REDIS_URL=${REDIS_URL}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     networks:
       - postgres
       - redis
     ports:
       - "8888:8888"
-    <<: *shared-volumes
+    # <<: *shared-volumes
 
   celery-worker:
     restart: always
@@ -53,6 +55,8 @@ services:
       - DJANGO_DEBUG=${DJANGO_DEBUG}
       - REDIS_URL=${REDIS_URL}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     networks:
       - postgres
       - redis

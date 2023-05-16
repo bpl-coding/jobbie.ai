@@ -37,8 +37,9 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
-  "http://localhost:3000",
-    # "*"
+#   "http://localhost:3000",
+    "http://*",
+    "https://*"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -144,29 +145,49 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+# STATIC_URL = "/static/"
+
+
+# STATIC_BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# DIST_PATH = STATIC_BASE_DIR / "static" / "dist"
+# SRC_PATH = STATIC_BASE_DIR / "static" / "src"
+
+
+# DJANGO_VITE_ASSETS_PATH = DIST_PATH
+
+# STATIC_ROOT = STATIC_BASE_DIR / "collectedstatic"
+# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# FRONTEND_DIR = STATIC_BASE_DIR / "static" / "src"
+
+# STATICFILES_DIRS = [
+#     STATIC_BASE_DIR / "static",
+#     DIST_PATH,
+#     SRC_PATH,
+# ]
+
+
+# if DEBUG:
+#     STATICFILES_DIRS += [FRONTEND_DIR]
+
+
+########################
 STATIC_URL = "/static/"
-DJANGO_VITE_DEV_MODE = DEBUG
+STATIC_ROOT = BASE_DIR.parent / "collectedstatic"
 
-DIST_PATH = BASE_DIR / "static" / "dist"
-SRC_PATH = BASE_DIR / "static" / "src"
-
-
-DJANGO_VITE_ASSETS_PATH = DIST_PATH
-
-STATIC_ROOT = BASE_DIR / "collectedstatic"
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-FRONTEND_DIR = BASE_DIR / "static" / "src"
+DJANGO_VITE_ASSETS_PATH = BASE_DIR.parent / "static" / "dist"
+DJANGO_VITE_DEV_MODE = True
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    DIST_PATH,
-    SRC_PATH,
+    DJANGO_VITE_ASSETS_PATH
 ]
 
-
+FRONTEND_DIR = BASE_DIR.parent / "static" / "src"
 if DEBUG:
     STATICFILES_DIRS += [FRONTEND_DIR]
+
+#######################
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
