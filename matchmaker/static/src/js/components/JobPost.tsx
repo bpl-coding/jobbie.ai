@@ -25,14 +25,17 @@ const JobPost: React.FC<JobPostProps> = ({
                 </div>
 
                 <div>
-                    <div className="px-10 pb-5">
+                    <div className="px-10 pb-5 flex flex-row items-center">
+                        <p className="text-lg text-gray-500">{new Date(job.time_posted * 1000).toISOString().split('T')[0]}</p>
                         {showDistance &&
-                            <>
+                            <div className="flex">
+                                <span className="mx-2"> | </span>
                                 <span className="font-semibold">Distance: </span>
                                 <span>{job.distance.toFixed(4)}</span>
-                            </>
+                            </div>
                         }
                     </div>
+
                 </div>
             </div>
             <div
