@@ -2,15 +2,17 @@ import string
 import subprocess
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
+from typing import List
 
 import mmh3
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from ninja import File, NinjaAPI, Router
+from ninja import File, NinjaAPI, Query, Router
 from ninja.errors import HttpError
 from ninja.files import UploadedFile
 from ninja.pagination import PageNumberPagination, paginate
 from pgvector.django import CosineDistance, L2Distance, MaxInnerProduct
+from taggit.models import Tag
 
 from .models import HNJobPosting, HNWhosHiringPost, Resume
 from .schema import (
@@ -20,7 +22,9 @@ from .schema import (
     HiringPostOutList,
     HNJobPostingSchemaOut,
     JobsOut,
+    JobsQueryParams,
     ResumeOut,
+    TagsOut,
     UploadResumeOut,
 )
 from .tasks import get_hn_job_postings
@@ -69,28 +73,19 @@ def resume_pdf_to_text(request, file: UploadedFile = File(...)):
     },
     tags=["jobs"],
 )
-def get_jobs(
-    request,
-    resume_id: int,
-    month: str,
-    year: int, 
-    page: int = 1,
-    page_size: int = 10,
-    distance: DistanceValidator = "cosine",
-    order_by: str = "ascending",
-):
+def get_jobs(request, params: JobsQueryParams = Query(...)):
     distance_mapping = {
         "l2": L2Distance,
         "cosine": CosineDistance,
         "maxInnerProduct": MaxInnerProduct,
     }
 
-    distance = distance_mapping[distance]
+    distance = distance_mapping[params.distance]
 
-    resume = get_object_or_404(Resume, hash=resume_id)
+    resume = get_object_or_404(Resume, hash=params.resume_id)
     embedding = resume.embedding
 
-    hiring_post = HNWhosHiringPost.objects.filter_by_month_year(month=month, year=year).first()
+    hiring_post = HNWhosHiringPost.objects.filter_by_month_year(month=params.month, year=params.year).first()
 
     closest_jobs = (
         HNJobPosting.objects.filter(
@@ -101,16 +96,40 @@ def get_jobs(
         .exclude(display_text__icontains="Willing to relocate:")
     )
 
-    if order_by == "ascending":
+    print(params.tags)
+
+    # print(params.tags)
+    # filter out empty strings from param.tags
+    # params.tags = [tag for tag in params.tags if tag]
+    # split on commas
+
+    
+    # print(params.tags)
+
+    # params.tags = [tag.split(',') for tag in params.tags]
+    # params.tags = [tag for tag in params.tags.split(',')]
+
+    # print(params.tags)
+
+    # if params.tags:
+    #     tags = params.tags.split(',')
+    #     closest_jobs = closest_jobs.filter(tags__name__in=tags)
+    if params.tags:
+        tags = params.tags.split(',')
+        for tag in tags:
+            closest_jobs = closest_jobs.filter(tags__name=tag)
+
+
+    if params.order_by == "ascending":
         closest_jobs = closest_jobs.order_by(distance("embedding", embedding))
-    elif order_by == "descending":
+    elif params.order_by == "descending":
         closest_jobs = closest_jobs.order_by(-distance("embedding", embedding))
 
     total_jobs = closest_jobs.count()
 
-    paginator = Paginator(closest_jobs, page_size)
+    paginator = Paginator(closest_jobs, params.page_size)
 
-    page_obj = paginator.get_page(page)
+    page_obj = paginator.get_page(params.page)
 
     closest_jobs = page_obj.object_list
 
@@ -143,3 +162,19 @@ def create_resume(request, resume: CreateResumeIn):
 def get_resume(request, resume_id: int):
     resume = get_object_or_404(Resume, hash=resume_id)
     return ResumeOut(id=resume.hash, text=resume.text)
+
+@router.get("/tags", tags=["tags"], response=TagsOut)
+def get_tags(request):
+
+    all_tags = [tag.name for tag in Tag.objects.all()]
+
+    categories = set(tag.split(':')[0] for tag in all_tags)
+
+    tags = {category: [] for category in categories}
+
+    for tag in all_tags:
+        category, tag_name = tag.split(':')
+        tags[category].append(tag_name)
+
+
+    return {"tags": tags}

@@ -30,6 +30,7 @@ kombu = "^5.2.4"
 gunicorn = "^20.1.0"
 tenacity = "^8.2.2"
 ipython = "^8.13.2"
+django-taggit = "^4.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

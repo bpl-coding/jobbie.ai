@@ -6,6 +6,7 @@ import {
   useResumeViewsGetJobsQuery,
   useResumeViewsCreateResumeMutation,
   useResumeViewsGetResumeQuery,
+  useResumeViewsGetTagsQuery,
 } from "./store/resumeApi";
 import { useSearchParams } from "react-router-dom";
 
@@ -30,8 +31,20 @@ type HiringPostTime = {
 };
 
 
+// function titleCase(str) {
+//   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+// }
+
+function titleCase(str) {
+  return str.substr(0, 1).toUpperCase() + str.substr(1).toLowerCase()
+}
+
+
 function App() {
   const HIRING_POSTS = JSON.parse(document.getElementById('hiring_posts')?.textContent ?? "{}") as HiringPostTime[];
+  const TAG_CATEGORIES = ['technology', 'location', 'role', 'job-type'];
+
+
   const selectedSlug = HIRING_POSTS[0].slug;
   const [selectedHiringPostTime, setSelectedHiringPostTime] = useState<HiringPostTime>(HIRING_POSTS[0]);
 
@@ -48,6 +61,24 @@ function App() {
   const [orderBy, setOrderBy] = useState<SortState>('ascending');
   const [shouldFetchJobs, setShouldFetchJobs] = useState(initialResumeId !== -1);
   const [resumeText, setResumeText] = useState<string>("");
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  console.log(selectedTags);
+
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+
+    setSelectedTags((prevTags) => {
+      if (checked) {
+        // If the checkbox was checked, add the tag to the array
+        return [...prevTags, value];
+      } else {
+        // If the checkbox was unchecked, filter the tag out of the array
+        return prevTags.filter((tag) => tag !== value);
+      }
+    });
+  };
 
 
   const {
@@ -78,9 +109,10 @@ function App() {
     isFetching: getJobsIsFetching,
     refetch,
   } = useResumeViewsGetJobsQuery(
-    { resumeId, page, pageSize, distance, orderBy: orderBy.toString(), month: selectedHiringPostTime.month, year: selectedHiringPostTime.year },
+    { resumeId, page, pageSize, distance, orderBy: orderBy.toString(), month: selectedHiringPostTime.month, year: selectedHiringPostTime.year, tags: selectedTags.join(',') },
     { skip: resumeId === -1 || !shouldFetchJobs }
   );
+
 
   const [
     resumePdfToText,
@@ -104,6 +136,16 @@ function App() {
     },
   ] = useResumeViewsCreateResumeMutation();
 
+
+  const {
+    data: tagsData,
+    error: tagsError,
+    isLoading: getTagsIsLoading,
+    isFetching: getTagsIsFetching,
+    refetch: refetchTags,
+  } = useResumeViewsGetTagsQuery();
+
+  console.log(tagsData);
 
   const [file, setFile] = useState(null);
 
@@ -163,6 +205,8 @@ function App() {
 
     // Fetch jobs after the resume is created
     setShouldFetchJobs(true);
+
+    refetch();
 
     scrollToSkeletonLoader();
 
@@ -267,6 +311,32 @@ function App() {
               value={resumeText}
             />
 
+            <div className="flex flex-row flex-wrap justify-center mt-5">
+
+              {tagsData &&
+                TAG_CATEGORIES.map((category) => (
+                  <div>
+
+                    <h3 className="text-lg text-gray-900 dark:text-white mb-2">{titleCase(category)}</h3>
+
+                    {tagsData.tags[category].map((tag) => (
+                      <div className="flex flex-row items-center justify-center mr-5 mb-2">
+                        <input
+                          type="checkbox"
+                          className="mr-2"
+                          value={category + ':' + tag}
+                          onChange={handleCheckboxChange}
+                        />
+                        <label className="text-sm text-gray-900 dark:text-white">{tag}</label>
+                      </div>
+                    ))}
+                  </div>
+
+                ))}
+            </div>
+
+
+
             <Accordion collapseAll={true} className="mt-5">
               <Accordion.Panel>
                 <Accordion.Title>
@@ -297,7 +367,7 @@ function App() {
           </form>
 
         </div>
-      </div>
+      </div >
 
       <div className="flex justify-between">
         {jobsData &&
@@ -331,7 +401,7 @@ function App() {
           </div>
         }
       </div>
-    </div>
+    </div >
   );
 }
 

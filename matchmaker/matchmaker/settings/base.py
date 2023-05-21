@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "django_extensions",
     'corsheaders',
+    'taggit',
     'django_vite',
     "resume",
 ]

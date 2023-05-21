@@ -25,6 +25,7 @@ const injectedRtkApi = api.injectEndpoints({
           page_size: queryArg.pageSize,
           distance: queryArg.distance,
           order_by: queryArg.orderBy,
+          tags: queryArg.tags,
         },
       }),
     }),
@@ -43,6 +44,12 @@ const injectedRtkApi = api.injectEndpoints({
       ResumeViewsGetResumeApiArg
     >({
       query: (queryArg) => ({ url: `/api/resume/${queryArg.resumeId}` }),
+    }),
+    resumeViewsGetTags: build.query<
+      ResumeViewsGetTagsApiResponse,
+      ResumeViewsGetTagsApiArg
+    >({
+      query: () => ({ url: `/api/tags` }),
     }),
   }),
   overrideExisting: false,
@@ -64,6 +71,7 @@ export type ResumeViewsGetJobsApiArg = {
   pageSize?: number;
   distance?: string;
   orderBy?: string;
+  tags?: string[];
 };
 export type ResumeViewsCreateResumeApiResponse =
   /** status 200 OK */ CreateResumeOut;
@@ -74,6 +82,8 @@ export type ResumeViewsGetResumeApiResponse = /** status 200 OK */ ResumeOut;
 export type ResumeViewsGetResumeApiArg = {
   resumeId: number;
 };
+export type ResumeViewsGetTagsApiResponse = /** status 200 OK */ TagsOut;
+export type ResumeViewsGetTagsApiArg = void;
 export type UploadResumeOut = {
   text: string;
 };
@@ -84,9 +94,9 @@ export type HnJobPostingSchemaOut = {
   posted_by: string;
   time_posted: number;
   updated_at: string;
-  raw_text: string;
   display_text: string;
-  embedding_text: string;
+  tags?: number[];
+  tagged_items?: number[];
   distance: number;
 };
 export type JobsOut = {
@@ -103,9 +113,15 @@ export type ResumeOut = {
   id: number;
   text: string;
 };
+export type TagsOut = {
+  tags: {
+    [key: string]: string[];
+  };
+};
 export const {
   useResumeViewsResumePdfToTextMutation,
   useResumeViewsGetJobsQuery,
   useResumeViewsCreateResumeMutation,
   useResumeViewsGetResumeQuery,
+  useResumeViewsGetTagsQuery,
 } = injectedRtkApi;
