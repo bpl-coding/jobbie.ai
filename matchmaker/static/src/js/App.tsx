@@ -370,11 +370,10 @@ function App() {
       </div>
 
       <div className="flex justify-between">
-        {jobsData && (
-          <p className="text-lg text-gray-900 dark:text-gray-100">
-            {jobsData.total_jobs} jobs found
-          </p>
-        )}
+
+        <p className="text-lg text-gray-900 dark:text-gray-100">
+          {jobsData?.total_jobs ?? 0} jobs found
+        </p>
 
         <div className="flex space-x-4">
           <Button onClick={onOpenModal} color="gray">
