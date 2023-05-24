@@ -1,7 +1,9 @@
 from .base import *
 
-# DEBUG = True
 ALLOWED_HOSTS=['*']
+
+DEBUG = False
+DJANGO_VITE_DEV_MODE = False
 
 DATABASES = {
     "default": {

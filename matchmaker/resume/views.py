@@ -96,34 +96,32 @@ def get_jobs(request, params: JobsQueryParams = Query(...)):
         .exclude(display_text__icontains="Willing to relocate:")
     )
 
-    print(params.tags)
-
-    # print(params.tags)
-    # filter out empty strings from param.tags
-    # params.tags = [tag for tag in params.tags if tag]
-    # split on commas
-
-    
-    # print(params.tags)
-
-    # params.tags = [tag.split(',') for tag in params.tags]
-    # params.tags = [tag for tag in params.tags.split(',')]
-
-    # print(params.tags)
-
-    # if params.tags:
-    #     tags = params.tags.split(',')
-    #     closest_jobs = closest_jobs.filter(tags__name__in=tags)
     if params.tags:
-        tags = params.tags.split(',')
-        for tag in tags:
-            closest_jobs = closest_jobs.filter(tags__name=tag)
+
+        # here we're ORing the tags within a category
+        # and ANDing across categories
+        # for example, full-time OR part-time AND python OR javascript
+        param_tags = params.tags.split(',')
+
+        categories = set(tag.split(':')[0] for tag in param_tags)
+
+        tags = {category: [] for category in categories}
+
+        for tag in param_tags:
+            category, tag_name = tag.split(':')
+            tags[category].append(tag)
+        
+        for category, tags in tags.items():
+            closest_jobs = closest_jobs.filter(tags__name__in=tags)
+
 
 
     if params.order_by == "ascending":
         closest_jobs = closest_jobs.order_by(distance("embedding", embedding))
     elif params.order_by == "descending":
         closest_jobs = closest_jobs.order_by(-distance("embedding", embedding))
+    
+    closest_jobs = closest_jobs.distinct()
 
     total_jobs = closest_jobs.count()
 

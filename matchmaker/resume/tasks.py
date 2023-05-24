@@ -13,6 +13,7 @@ from matchmaker.celery import app
 
 from .models import HNJobPosting, HNWhosHiringPost
 from .utils import fetch, get_embedding
+from taggit.models import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -339,7 +340,7 @@ def populate_tags():
             'salt-lake-city': HNJobPosting.matching_words(['Salt Lake City']),
             'san-antonio': HNJobPosting.matching_words(['San Antonio']),
             'san-diego': HNJobPosting.matching_words(['San Diego']),
-            'san-francisco': HNJobPosting.matching_words(['San Francisco', 'S.F.']),
+            'san-francisco': HNJobPosting.matching_words(['San Francisco', 'S.F.', 'SF']),
             'san-jose': HNJobPosting.matching_words(['San Jose']),
             'san-mateo': HNJobPosting.matching_words(['San Mateo']),
             'sao-paulo': HNJobPosting.matching_words(['Sao Paulo', 'São Paulo']),
@@ -349,6 +350,7 @@ def populate_tags():
             'singapore': HNJobPosting.matching_words(['Singapore']),
             'st-louis': HNJobPosting.matching_words(['St. Louis']),
             'stockholm': HNJobPosting.matching_words(['Stockholm']),
+            'sunnnyvale' : HNJobPosting.matching_words(['Sunnyvale']),
             'sydney': HNJobPosting.matching_words(['Sydney']),
             'tel-aviv': HNJobPosting.matching_words(['Tel Aviv']),
             'tokyo': HNJobPosting.matching_words(['Tokyo']),
@@ -380,6 +382,12 @@ def populate_tags():
         }
     }
     # fmt: on
+
+    # register all tags
+    for kind, finder in finders.items():
+        for slug, query in finder.items():
+            tag_name = f"{kind}:{slug}"
+            Tag.objects.get_or_create(name=tag_name)
 
     for kind, finder in finders.items():
         existing_tags = HNJobPosting.tags.filter(

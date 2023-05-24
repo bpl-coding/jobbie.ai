@@ -17,12 +17,17 @@ import './App.css';
 
 import { Element } from 'react-scroll';
 import SkeletonLoader from "./components/SkeletonLoader";
-import { Accordion, Tooltip } from "flowbite-react";
+import { Accordion, Button, Tooltip, Checkbox, Label } from "flowbite-react";
 import RadioForm from "./components/RadioForm";
 import ToggleSwitch from './components/ToggleSwitch';
 import Paginator from "./components/Paginator";
 import FileUpload from "./components/FileUpload";
 import JobPost from "./components/JobPost";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
+
+import 'react-responsive-modal/styles.css';
+import { Modal } from 'react-responsive-modal';
 
 type HiringPostTime = {
   month: string;
@@ -31,13 +36,20 @@ type HiringPostTime = {
 };
 
 
-// function titleCase(str) {
-//   return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-// }
+function titleize(inputStr) {
+  // First, replace all dashes with spaces
+  let str = inputStr.replace(/-/g, ' ');
 
-function titleCase(str) {
-  return str.substr(0, 1).toUpperCase() + str.substr(1).toLowerCase()
+  // Then, split the string into words, capitalize the first letter of each word, 
+  // then join the words back together with spaces
+  let words = str.split(' ');
+  for (let i = 0; i < words.length; i++) {
+    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+  }
+  return words.join(' ');
 }
+
+
 
 
 function App() {
@@ -64,7 +76,11 @@ function App() {
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  console.log(selectedTags);
+
+
+  const [open, setOpen] = useState(false);
+  const onOpenModal = () => setOpen(true);
+  const onCloseModal = () => setOpen(false);
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -145,8 +161,6 @@ function App() {
     refetch: refetchTags,
   } = useResumeViewsGetTagsQuery();
 
-  console.log(tagsData);
-
   const [file, setFile] = useState(null);
 
   const [errorMsg, setErrorMsg] = useState("");
@@ -186,7 +200,6 @@ function App() {
   };
 
   const handleResumeTextSubmit = async (event) => {
-    event.preventDefault();
 
     if (!resumeText) {
       alert("Please enter resume text to upload");
@@ -265,6 +278,7 @@ function App() {
       </div>
 
 
+
       <Tooltip content="You can also copy/paste the contents of your resume">
         <div className="flex flex-col sm:flex-row items-start sm:items-end text-gray-900 mt-10 mb-3">
           <div className="flex items-center mb-1 sm:mb-0">
@@ -311,30 +325,6 @@ function App() {
               value={resumeText}
             />
 
-            <div className="flex flex-row flex-wrap justify-center mt-5">
-
-              {tagsData &&
-                TAG_CATEGORIES.map((category) => (
-                  <div>
-
-                    <h3 className="text-lg text-gray-900 dark:text-white mb-2">{titleCase(category)}</h3>
-
-                    {tagsData.tags[category].map((tag) => (
-                      <div className="flex flex-row items-center justify-center mr-5 mb-2">
-                        <input
-                          type="checkbox"
-                          className="mr-2"
-                          value={category + ':' + tag}
-                          onChange={handleCheckboxChange}
-                        />
-                        <label className="text-sm text-gray-900 dark:text-white">{tag}</label>
-                      </div>
-                    ))}
-                  </div>
-
-                ))}
-            </div>
-
 
 
             <Accordion collapseAll={true} className="mt-5">
@@ -373,7 +363,24 @@ function App() {
         {jobsData &&
           <p className="text-lg text-gray-900 dark:text-gray-100">{jobsData.total_jobs} jobs found</p>
         }
-        <OrderBy sortState={[orderBy, setOrderBy]} onSortChange={() => { setPage(1) }} />
+
+
+
+        <div className="flex space-x-4">
+
+          <Button onClick={onOpenModal} color="gray">
+            <span className="font-medium">
+              Apply Filters
+            </span>
+            <FontAwesomeIcon icon={faFilter} className="ml-2" />
+          </Button>
+
+          <OrderBy sortState={[orderBy, setOrderBy]} onSortChange={() => { setPage(1) }} />
+
+        </div>
+
+
+
       </div>
 
       <Element name="skeletonLoader">
@@ -401,7 +408,76 @@ function App() {
           </div>
         }
       </div>
+
+
+      <Modal
+        open={open}
+        onClose={onCloseModal}
+      >
+        <>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Filter Jobs
+          </h3>
+          <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+
+          <div className="flex flex-col">
+            {tagsData &&
+              TAG_CATEGORIES.map((category) => (
+                <div className="mb-5">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {titleize(category)}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-1">
+                    {tagsData.tags[category].map((tag) => {
+                      const id = `${category}:${tag}`;
+                      return (
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={id}
+                            className="mr-2"
+                            checked={selectedTags.includes(id)}
+                            value={id}
+                            onChange={handleCheckboxChange}
+                          />
+                          <label htmlFor={id} className="text-gray-900 dark:text-white">
+                            {titleize(tag)}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
+          <div className="py-4">
+
+            <div className="flex space-x-4">
+
+              <Button onClick={onCloseModal}>
+                Apply Filters
+              </Button>
+              <Button
+                color="gray"
+                onClick={() => { setSelectedTags([]) }}
+              >
+                Clear All Filters
+              </Button>
+            </div>
+          </div>
+        </>
+      </Modal>
+
     </div >
+
+
+
+
+
+
   );
 }
 
