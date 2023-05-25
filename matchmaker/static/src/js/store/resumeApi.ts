@@ -71,7 +71,7 @@ export type ResumeViewsGetJobsApiArg = {
   pageSize?: number;
   distance?: string;
   orderBy?: string;
-  tags?: string[];
+  tags?: string;
 };
 export type ResumeViewsCreateResumeApiResponse =
   /** status 200 OK */ CreateResumeOut;

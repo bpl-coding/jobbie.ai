@@ -201,6 +201,8 @@ function App() {
   };
 
   const handleResumeTextSubmit = async (event) => {
+    event.preventDefault();
+
     if (!resumeText) {
       alert("Please enter resume text to upload");
       return;
@@ -309,7 +311,7 @@ function App() {
           Step 2
         </span>
         <span className="text-md sm:text-lg font-semibold ml-0 sm:ml-2 mt-1 sm:mt-0">
-          <span className="hidden sm:inline">- </span>Search for similar jobs to
+          <span className="hidden sm:inline">- </span>Search for jobs similar to
           your resume
         </span>
       </div>
