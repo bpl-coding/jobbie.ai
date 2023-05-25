@@ -32,6 +32,7 @@ services:
     networks:
       - postgres
       - redis
+      - django
     ports:
       - "8888:8888"
     # <<: *shared-volumes
@@ -60,7 +61,7 @@ services:
     networks:
       - postgres
       - redis
-    <<: *shared-volumes
+    # <<: *shared-volumes
 
   postgres:
     container_name: postgres
@@ -89,6 +90,8 @@ networks:
   postgres:
     driver: bridge
   redis:
+    driver: bridge
+  django:
     driver: bridge
 
 volumes:
