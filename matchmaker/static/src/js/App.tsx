@@ -52,7 +52,7 @@ function App() {
   const HIRING_POSTS = JSON.parse(
     document.getElementById("hiring_posts")?.textContent ?? "{}"
   ) as HiringPostTime[];
-  const TAG_CATEGORIES = ["technology", "location", "role", "job-type"];
+  const TAG_CATEGORIES = ["technology", "arrangement", "location", "role", "job-type"];
 
   const selectedSlug = HIRING_POSTS[0].slug;
   const [selectedHiringPostTime, setSelectedHiringPostTime] =
@@ -441,7 +441,7 @@ function App() {
                     {titleize(category)}
                   </h3>
                   <div className="grid grid-cols-2 gap-1">
-                    {tagsData.tags[category].map((tag) => {
+                    {tagsData.tags[category] && tagsData.tags[category].map((tag) => {
                       const id = `${category}:${tag}`;
                       return (
                         <div className="flex items-center">

@@ -38,51 +38,6 @@ class MonthYearFilterManager(models.Manager):
 
         return qs
 
-# from django.db import models
-# from django.contrib.postgres.fields import ArrayField
-
-# class TagRule(models.Model):
-#     CATEGORY_CHOICES = [
-#         ('technology', 'Technology'),
-#         ('location', 'Location'),
-#         ('role', 'Role'),
-#         ('job-type', 'Job Type'),
-#     ]
-
-#     MATCHING_TYPE_CHOICES = [
-#         ('matching_words', 'Matching Words'),
-#         ('matching_regex', 'Matching Regex'),
-#         ('not_matching_words', 'Not Matching Words'),
-#     ]
-
-#     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
-#     slug = models.SlugField(max_length=100)
-#     matching_type = models.CharField(max_length=20, choices=MATCHING_TYPE_CHOICES)
-#     matching_arguments = ArrayField(models.TextField())  # to store the list of words or regex patterns
-#     display_name = models.CharField(max_length=100)
-# from taggit.models import GenericTaggedItemBase, TagBase
-
-
-# class HNJobPostingTag(TagBase):
-
-#     display_name = models.CharField(max_length=100)
-
-#     class Meta:
-#         app_label = "resume"
-#         verbose_name = "Tag"
-#         verbose_name_plural = "Tags"
-    
-
-# class TaggedHNJobPosting(GenericTaggedItemBase):
-
-#     tag = models.ForeignKey(
-#         HNJobPostingTag,
-#         on_delete=models.CASCADE,
-#         related_name="%(app_label)s_%(class)s_items",
-#     )
-
-
-
 
 class HNJobPosting(models.Model):
     class Meta:

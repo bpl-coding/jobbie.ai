@@ -8,12 +8,12 @@ import nh3
 import openai
 from bs4 import BeautifulSoup
 from django.db import IntegrityError
+from taggit.models import Tag
 
 from matchmaker.celery import app
 
 from .models import HNJobPosting, HNWhosHiringPost
 from .utils import fetch, get_embedding
-from taggit.models import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +75,8 @@ def get_hn_job_postings(
         month = datetime.strptime(month, "%B").month
 
     # check if we've already indexed the job postings for this month/year
-    # if not HNWhosHiringPost.objects.filter_by_month_year(month, year).exists():
-    # index_job_postings(month, year)
+    if not HNWhosHiringPost.objects.filter_by_month_year(month, year).exists():
+        index_job_postings(month, year)
 
     # get the post for the month/year
     post = HNWhosHiringPost.objects.filter_by_month_year(month, year).first()
@@ -85,6 +85,8 @@ def get_hn_job_postings(
 
     HNJobPosting.objects.bulk_create(job_postings, ignore_conflicts=True)
     update_embeddings_for_job_postings(update_embeddings)
+
+    populate_tags()
 
 
 def fetch_latest_stories_from_user(user: str, count: int) -> list[str]:
@@ -215,6 +217,15 @@ def clean_text(text: str) -> str:
 def populate_tags():
     # fmt: off
     finders = {
+        'arrangement': {
+            'remote':  HNJobPosting.matching_regex('(full?.remote)|(100%\sremote|remote)') &
+                        HNJobPosting.not_matching_words(['No Remote', 'On-site', 'Onsite', 'In Person']) ,
+            'in-person' : HNJobPosting.matching_words(['No Remote', 'In Person', 'Office']) | 
+                           HNJobPosting.matching_regex('on[-\s]site') | 
+                           HNJobPosting.matching_regex('in[-\s]person') & 
+                           HNJobPosting.not_matching_words(['Remote']),
+            'hybrid': HNJobPosting.matching_words(['Hybrid', 'Partial Remote', 'Partial WFH', 'Partial Work From Home'])                           
+        },
         'technology': {
             'android': HNJobPosting.matching_words(['android']),
             'angular': HNJobPosting.matching_words(['angular', 'angularjs']),
@@ -336,7 +347,6 @@ def populate_tags():
             'pune': HNJobPosting.matching_words(['Pune']),
             'raleigh': HNJobPosting.matching_words(['Raleigh']),
             'redwood-city': HNJobPosting.matching_words(['Redwood City']),
-            'remote': HNJobPosting.matching_words(['Remote']) & HNJobPosting.not_matching_words(['No Remote']) & HNJobPosting.matching_regex('remote(?<!<\/p>.*)'),
             'salt-lake-city': HNJobPosting.matching_words(['Salt Lake City']),
             'san-antonio': HNJobPosting.matching_words(['San Antonio']),
             'san-diego': HNJobPosting.matching_words(['San Diego']),
@@ -398,15 +408,14 @@ def populate_tags():
         for slug, query in finder.items():
             tag_name = f"{kind}:{slug}"
             print(tag_name)
-            if tag_name not in existing_tags:
-                for posting in HNJobPosting.objects.filter(query):
-                    posting.tags.add(tag_name)
+            for posting in HNJobPosting.objects.filter(query):
+                posting.tags.add(tag_name)
 
-            postings_with_tag = HNJobPosting.objects.filter(tags__name=tag_name)
-            for posting in HNJobPosting.objects.exclude(
-                id__in=postings_with_tag.values_list("id", flat=True)
-            ):
-                posting.tags.remove(tag_name)
+            # postings_with_tag = HNJobPosting.objects.filter(tags__name=tag_name)
+            # for posting in HNJobPosting.objects.exclude(
+            #     id__in=postings_with_tag.values_list("id", flat=True)
+            # ):
+            #     posting.tags.remove(tag_name)
 
         for tag_name in existing_tags:
             if tag_name.split(":")[1] not in finder.keys():
