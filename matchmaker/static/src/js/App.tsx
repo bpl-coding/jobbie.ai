@@ -29,6 +29,8 @@ import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 
+import { formatTag } from "./utils/tagFormatter";
+
 type HiringPostTime = {
   month: string;
   year: number;
@@ -457,7 +459,7 @@ function App() {
                             htmlFor={id}
                             className="text-gray-900 dark:text-white"
                           >
-                            {titleize(tag)}
+                            {formatTag(id)}
                           </label>
                         </div>
                       );

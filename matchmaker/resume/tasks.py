@@ -262,6 +262,7 @@ def populate_tags():
             'rust': HNJobPosting.matching_words(['rust']),
             'scala': HNJobPosting.matching_words(['scala']),
             'swift': HNJobPosting.matching_words(['swift']),
+            'typescript': HNJobPosting.matching_words(['typescript']),
             'vue': HNJobPosting.matching_words(['vue', 'vuejs']),
             'wasm': HNJobPosting.matching_words(['wasm', 'webassembly']),
         },
