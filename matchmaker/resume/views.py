@@ -82,7 +82,7 @@ def get_jobs(request, params: JobsQueryParams = Query(...)):
 
     distance = distance_mapping[params.distance]
 
-    resume = get_object_or_404(Resume, hash=params.resume_id)
+    resume = get_object_or_404(Resume, uuid=params.resume_uuid)
     embedding = resume.embedding
 
     hiring_post = HNWhosHiringPost.objects.filter_by_month_year(month=params.month, year=params.year).first()
@@ -152,13 +152,13 @@ def create_resume(request, resume: CreateResumeIn):
         resume = Resume.objects.create(text=resume_text, embedding=embedding, hash=hash)
         resume.save()
 
-    return {"id": resume.hash}
+    return {"uuid": resume.uuid.hex}
 
 
-@router.get("/resume/{resume_id}", tags=["resume"], response=ResumeOut)
-def get_resume(request, resume_id: int):
-    resume = get_object_or_404(Resume, hash=resume_id)
-    return ResumeOut(id=resume.hash, text=resume.text)
+@router.get("/resume/{resume_uuid}", tags=["resume"], response=ResumeOut)
+def get_resume(request, resume_uuid: str):
+    resume = get_object_or_404(Resume, uuid=resume_uuid)
+    return ResumeOut(text=resume.text, uuid=resume.uuid.hex)
 
 @router.get("/tags", tags=["tags"], response=TagsOut)
 def get_tags(request):

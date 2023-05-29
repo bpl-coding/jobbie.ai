@@ -11,6 +11,7 @@ class Resume(models.Model):
     class Meta:
         app_label = "resume"
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     text = models.TextField()
     hash = models.PositiveBigIntegerField()
     embedding = VectorField(dimensions=1536, null=True, blank=True)

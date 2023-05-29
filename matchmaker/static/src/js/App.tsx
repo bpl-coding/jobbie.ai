@@ -62,15 +62,15 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Initialize the state variables using the values from the URL search parameters
-  const initialResumeId = parseInt(searchParams.get("resumeId") || "-1", 10);
+  const initialResumeUUID = searchParams.get("resumeUUID") || "";
 
-  const [resumeId, setResumeId] = useState(initialResumeId);
+  const [resumeUUID, setResumeUUID] = useState<string>(initialResumeUUID);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [distance, setDistance] = useState("cosine");
   const [orderBy, setOrderBy] = useState<SortState>("ascending");
   const [shouldFetchJobs, setShouldFetchJobs] = useState(
-    initialResumeId !== -1
+    initialResumeUUID !== ""
   );
   const [resumeText, setResumeText] = useState<string>("");
 
@@ -100,8 +100,8 @@ function App() {
     isLoading: getResumeIsLoading, // Whether the query is currently loading
     isFetching: getResumeIsFetching, // Whether the query is currently fetching in the background
   } = useResumeViewsGetResumeQuery(
-    { resumeId }, // Pass the resumeId as a parameter to the query
-    { skip: resumeId === -1 } // Optionally, skip the query if resumeId is -1
+    { resumeUUID }, // Pass the resumeUUID as a parameter to the query
+    { skip: resumeUUID === "" } // Optionally, skip the query if resumeUUID is -1
   );
 
   const handleSelectChange = (event) => {
@@ -121,7 +121,7 @@ function App() {
     refetch,
   } = useResumeViewsGetJobsQuery(
     {
-      resumeId,
+      resumeUuid: resumeUUID,
       page,
       pageSize,
       distance,
@@ -130,7 +130,7 @@ function App() {
       year: selectedHiringPostTime.year,
       tags: selectedTags.join(","),
     },
-    { skip: resumeId === -1 || !shouldFetchJobs }
+    { skip: resumeUUID === "" || !shouldFetchJobs }
   );
 
   const [
@@ -217,11 +217,11 @@ function App() {
       return;
     }
 
-    const resumeId = response.data.id;
+    const resumeUUID = response.data.uuid;
 
-    setResumeId(resumeId);
+    setResumeUUID(resumeUUID);
 
-    setSearchParams({ resumeId: resumeId.toString() }, { replace: true });
+    setSearchParams({ resumeUUID: resumeUUID.toString() }, { replace: true });
 
     // Fetch jobs after the resume is created
     setShouldFetchJobs(true);

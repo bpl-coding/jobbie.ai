@@ -18,7 +18,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/jobs`,
         params: {
-          resume_id: queryArg.resumeId,
+          resume_uuid: queryArg.resumeUuid,
           month: queryArg.month,
           year: queryArg.year,
           page: queryArg.page,
@@ -43,7 +43,7 @@ const injectedRtkApi = api.injectEndpoints({
       ResumeViewsGetResumeApiResponse,
       ResumeViewsGetResumeApiArg
     >({
-      query: (queryArg) => ({ url: `/api/resume/${queryArg.resumeId}` }),
+      query: (queryArg) => ({ url: `/api/resume/${queryArg.resumeUuid}` }),
     }),
     resumeViewsGetTags: build.query<
       ResumeViewsGetTagsApiResponse,
@@ -64,7 +64,7 @@ export type ResumeViewsResumePdfToTextApiArg = {
 };
 export type ResumeViewsGetJobsApiResponse = /** status 200 OK */ JobsOut;
 export type ResumeViewsGetJobsApiArg = {
-  resumeId: number;
+  resumeUuid: string;
   month: string;
   year: number;
   page?: number;
@@ -80,7 +80,7 @@ export type ResumeViewsCreateResumeApiArg = {
 };
 export type ResumeViewsGetResumeApiResponse = /** status 200 OK */ ResumeOut;
 export type ResumeViewsGetResumeApiArg = {
-  resumeId: number;
+  resumeUuid: number;
 };
 export type ResumeViewsGetTagsApiResponse = /** status 200 OK */ TagsOut;
 export type ResumeViewsGetTagsApiArg = void;
@@ -104,13 +104,13 @@ export type JobsOut = {
   total_jobs: number;
 };
 export type CreateResumeOut = {
-  id: number;
+  uuid: string;
 };
 export type CreateResumeIn = {
   text: string;
 };
 export type ResumeOut = {
-  id: number;
+  uuid: string;
   text: string;
 };
 export type TagsOut = {

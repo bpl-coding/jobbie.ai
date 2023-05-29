@@ -1,3 +1,4 @@
+import uuid
 from typing import Dict, List, Optional
 
 from ninja import Field, ModelSchema, Router, Schema
@@ -32,7 +33,7 @@ class CreateResumeIn(Schema):
 
 
 class CreateResumeOut(Schema):
-    id: int
+    uuid: str
 
 
 class UploadResumeOut(Schema):
@@ -40,7 +41,7 @@ class UploadResumeOut(Schema):
 
 
 class ResumeOut(Schema):
-    id: int
+    uuid: str
     text: str
 
 
@@ -63,13 +64,11 @@ class TagsOut(Schema):
 
 
 class JobsQueryParams(Schema):
-    resume_id: int
+    resume_uuid: str
     month: str
     year: int
     page: int = 1
     page_size: int = 10
     distance: str = "cosine"
     order_by: str = "ascending"
-    # tags: Optional[List[str]] = Field(None)
-    # tags: List[str] = []
     tags: str = ""
