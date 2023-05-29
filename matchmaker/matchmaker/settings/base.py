@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
-
+PRODUCTION = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,6 +43,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 
 # Application definition
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "django_extensions",
     'corsheaders',
     'taggit',
+    'matchmaker',
     'django_vite',
     "resume",
 ]

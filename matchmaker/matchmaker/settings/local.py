@@ -1,6 +1,8 @@
 from .base import *
 
-# DEBUG = True
+DEBUG = True
+DJANGO_VITE_DEV_MODE = True
+PRODUCTION = False
 ALLOWED_HOSTS=['*']
 
 DATABASES = {

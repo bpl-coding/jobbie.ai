@@ -4,6 +4,7 @@ ALLOWED_HOSTS=['*']
 
 DEBUG = False
 DJANGO_VITE_DEV_MODE = False
+PRODUCTION = True
 
 DATABASES = {
     "default": {
