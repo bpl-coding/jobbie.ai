@@ -32,13 +32,13 @@ const JobPost: React.FC<JobPostProps> = ({
                 <div>
                     <div className="px-10 pb-5 flex flex-row items-center">
                         <a href={"https://news.ycombinator.com/item?id=" + job.hn_id}>
-                            <p className="text-lg text-gray-500 hover:text-gray-700">{convertTimePosted(job.time_posted)}</p>
+                            <p className="text-lg text-gray-500 hover:text-gray-700 dark:text-gray-400">{convertTimePosted(job.time_posted)}</p>
                         </a>
                         {showDistance &&
                             <div className="flex">
-                                <span className="mx-2"> | </span>
-                                <span className="font-semibold">Distance: </span>
-                                <span>{job.distance.toFixed(4)}</span>
+                                <span className="mx-2 dark:text-gray-200"> | </span>
+                                <span className="font-semibold dark:text-gray-200">Distance: </span>
+                                <span className="dark:text-gray-200">{job.distance.toFixed(4)}</span>
                             </div>
                         }
                     </div>
@@ -46,7 +46,7 @@ const JobPost: React.FC<JobPostProps> = ({
                 </div>
             </div>
             <div
-                className="wrap-display-text text-xl max-w-full mx-10"
+                className="wrap-display-text text-xl max-w-full mx-10 dark:text-gray-200"
                 dangerouslySetInnerHTML={{ __html: job.display_text }}
             />
         </div>

@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 
-a {
-  color: blue;
-  text-decoration: none;
-}
+@layer base {
+  .dark a {
+    @apply text-blue-300;
+  }
 
-a:active {
-  color: purple;
+  a {
+    @apply text-pure-blue;
+  }
 }

@@ -6,7 +6,7 @@ export type SortState = 'ascending' | 'descending';
 
 interface OrderByProps {
     sortState: [SortState, React.Dispatch<React.SetStateAction<SortState>>];
-    onSortChange: () => void; 
+    onSortChange: () => void;
 }
 
 const OrderBy: React.FC<OrderByProps> = ({ sortState, onSortChange }) => {
@@ -38,11 +38,11 @@ const OrderBy: React.FC<OrderByProps> = ({ sortState, onSortChange }) => {
         <button onClick={handleClick}>
             <div className='flex'>
                 <div className="mr-5">
-                    {externalSort === 'ascending' ? <h3>Best matches first</h3> : <h3>Worst matches first</h3>}
+                    {externalSort === 'ascending' ? <h3 className="dark:text-gray-200">Best matches first</h3> : <h3 className="dark:text-gray-200">Worst matches first</h3>}
                 </div>
-                {internalSort === 'initial' && <FontAwesomeIcon icon={faSort} />}
-                {internalSort === 'ascending' && <FontAwesomeIcon icon={faSortUp} />}
-                {internalSort === 'descending' && <FontAwesomeIcon icon={faSortDown} />}
+                {internalSort === 'initial' && <FontAwesomeIcon icon={faSort} className="dark:text-gray-200" />}
+                {internalSort === 'ascending' && <FontAwesomeIcon icon={faSortUp} className="dark:text-gray-200" />}
+                {internalSort === 'descending' && <FontAwesomeIcon icon={faSortDown} className="dark:text-gray-200" />}
             </div>
         </button>
     )

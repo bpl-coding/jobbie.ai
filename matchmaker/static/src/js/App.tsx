@@ -30,6 +30,7 @@ import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 
 import { formatTag } from "./utils/tagFormatter";
+import DarkModeButton from "./components/DarkModeButton";
 
 type HiringPostTime = {
   month: string;
@@ -260,217 +261,226 @@ function App() {
   ];
 
   return (
-    <div className="container mx-auto px-10 dark:bg-slate-800">
 
-      <div className="my-20">
-        <div className="flex flex-col items-center justify-center w-full mt-20">
-          <h1 className="text-2xl sm:text-4xl  font-bold text-gray-900 dark:text-gray-100 ">
-            HN Resume to Jobs
-          </h1>
-        </div>
+    <div className="min-h-screen bg-white dark:bg-slate-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="flex flex-row items-center justify-center w-full">
-          <h2 className="text-gray-900 dark:text-gray-100 mr-1">
-            Find jobs most relevant to your resume for
-          </h2>
 
-          <select
-            onChange={handleSelectChange}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block py-0.5 px-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            {HIRING_POSTS.map((post) => (
-              <option
-                key={post.slug}
-                value={`${post.month}-${post.year}`}
-                selected={post.slug === selectedSlug}
-              >
-                {post.month} {post.year}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <h3 className="font-bold my-2">Upload or Copy/Paste Your Resume</h3>
-      <div className="flex flex-col sm:flex-row items-start sm:items-stretch">
-        <div className="flex flex-col w-full sm:w-1/3">
-          <FileUpload
-            file={file}
-            onFileChange={handleFileChange}
-            errorMsg={errorMsg}
-          />
+        <div className="flex flex-row justify-end items-end pt-5">
+          <DarkModeButton />
         </div>
 
 
-        <div className="inline-block h-100 w-1 mx-5 self-stretch bg-neutral-100 opacity-100  dark:opacity-50"></div>
+        <div className="my-20">
+          <div className="flex flex-col items-center justify-center w-full mt-20">
+            <h1 className="text-2xl sm:text-4xl  font-bold text-gray-900 dark:text-gray-100 ">
+              HN Resume to Jobs
+            </h1>
+          </div>
 
+          <div className="flex flex-row items-center justify-center w-full">
+            <h2 className="text-gray-900 dark:text-gray-100 mr-1">
+              Find jobs most relevant to your resume for
+            </h2>
 
-        <div className="flex flex-col w-full sm:w-2/3 sm:mt-0 mt-10">
-          <textarea
-            id="resume-text"
-            name="resume-text"
-            className="block p-2.5 w-full flex-grow text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[500px] sm:min-h-[0px]"
-            placeholder="Enter the text of your resume..."
-            onChange={(e) => setResumeText(e.target.value)}
-            value={resumeText}
-          />
+            <select
+              onChange={handleSelectChange}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block py-0.5 px-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              {HIRING_POSTS.map((post) => (
+                <option
+                  key={post.slug}
+                  value={`${post.month}-${post.year}`}
+                  selected={post.slug === selectedSlug}
+                >
+                  {post.month} {post.year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
 
-
-      <div className="flex flex-row mt-5">
-        <div className="w-full">
-          <form onSubmit={handleResumeTextSubmit} className="w-full h-full">
-            <Accordion collapseAll={true}>
-              <Accordion.Panel>
-                <Accordion.Title>Advanced Options</Accordion.Title>
-                <Accordion.Content>
-                  <ToggleSwitch
-                    isChecked={showDistance}
-                    setIsChecked={setShowDistance}
-                    label="Show Distance"
-                  />
-
-                  <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
-                    Distance Function
-                  </h3>
-                  <RadioForm
-                    options={distanceFunctionOptions}
-                    value={distance}
-                    onChange={setDistance}
-                  />
-                </Accordion.Content>
-              </Accordion.Panel>
-            </Accordion>
-
-            <div className="flex justify-center my-10">
-              <button
-                type="submit"
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 my-5"
-                onClick={() => {
-                  scrollToSkeletonLoader();
-                }}
-              >
-                Search Jobs
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-
-      <div className="flex justify-between">
-
-        <p className="text-lg text-gray-900 dark:text-gray-100">
-          {jobsData?.total_jobs ?? 0} jobs found
-        </p>
-
-        <div className="flex space-x-4">
-          <Button onClick={onOpenModal} color="gray">
-            <span className="font-medium">Apply Filters</span>
-            <FontAwesomeIcon icon={faFilter} className="ml-2 text-gray-600" />
-          </Button>
-
-          <OrderBy
-            sortState={[orderBy, setOrderBy]}
-            onSortChange={() => {
-              setPage(1);
-            }}
-          />
-        </div>
-      </div>
-
-      <Element name="skeletonLoader">
-        {(getJobsIsLoading || getJobsIsFetching) && !jobsError && (
-          <>
-            {[...Array(3)].map((_, index) => (
-              <div key={index}>
-                <hr className="border-gray-300 dark:border-gray-600 my-10" />
-                <SkeletonLoader />
-              </div>
-            ))}
-            <div className="mb-28"></div>
-          </>
-        )}
-      </Element>
-
-      <div>
-        {!getJobsIsLoading &&
-          !jobsError &&
-          jobsData &&
-          jobsData.jobs.map((job) => (
-            <JobPost job={job} showDistance={showDistance} />
-          ))}
-
-        {!getJobsIsLoading && !jobsError && jobsData && (
-          <div className="py-16">
-            <Paginator
-              page={page}
-              setPage={setPage}
-              pageSize={pageSize}
-              totalJobs={jobsData.total_jobs}
+        <h3 className="font-bold my-2 dark:text-gray-200">Upload or Copy/Paste Your Resume</h3>
+        <div className="flex flex-col sm:flex-row items-start sm:items-stretch">
+          <div className="flex flex-col w-full sm:w-1/3">
+            <FileUpload
+              file={file}
+              onFileChange={handleFileChange}
+              errorMsg={errorMsg}
             />
           </div>
-        )}
-      </div>
 
-      <Modal open={open} onClose={onCloseModal}>
-        <>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Filter Jobs
-          </h3>
-          <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
-          <div className="flex flex-col">
-            {tagsData &&
-              TAG_CATEGORIES.map((category) => (
-                <div className="mb-5">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    {titleize(category)}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-1">
-                    {tagsData.tags[category] && tagsData.tags[category].map((tag) => {
-                      const id = `${category}:${tag}`;
-                      return (
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id={id}
-                            className="mr-2"
-                            checked={selectedTags.includes(id)}
-                            value={id}
-                            onChange={handleCheckboxChange}
-                          />
-                          <label
-                            htmlFor={id}
-                            className="text-gray-900 dark:text-white"
-                          >
-                            {formatTag(id)}
-                          </label>
-                        </div>
-                      );
-                    })}
-                  </div>
+          <div className="inline-block h-100 w-1 mx-5 self-stretch bg-neutral-100 opacity-100  dark:opacity-50"></div>
+
+
+          <div className="flex flex-col w-full sm:w-2/3 sm:mt-0 mt-10">
+            <textarea
+              id="resume-text"
+              name="resume-text"
+              className="block p-2.5 w-full flex-grow text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[500px] sm:min-h-[0px]"
+              placeholder="Enter the text of your resume..."
+              onChange={(e) => setResumeText(e.target.value)}
+              value={resumeText}
+            />
+          </div>
+        </div>
+
+
+        <div className="flex flex-row mt-5">
+          <div className="w-full">
+            <form onSubmit={handleResumeTextSubmit} className="w-full h-full">
+              <Accordion collapseAll={true}>
+                <Accordion.Panel>
+                  <Accordion.Title>Advanced Options</Accordion.Title>
+                  <Accordion.Content>
+                    <ToggleSwitch
+                      isChecked={showDistance}
+                      setIsChecked={setShowDistance}
+                      label="Show Distance"
+                    />
+
+                    <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
+                      Distance Function
+                    </h3>
+                    <RadioForm
+                      options={distanceFunctionOptions}
+                      value={distance}
+                      onChange={setDistance}
+                    />
+                  </Accordion.Content>
+                </Accordion.Panel>
+              </Accordion>
+
+              <div className="flex justify-center my-10">
+                <button
+                  type="submit"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 my-5"
+                  onClick={() => {
+                    scrollToSkeletonLoader();
+                  }}
+                >
+                  Search Jobs
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+        <div className="flex justify-between">
+
+          <p className="text-lg text-gray-900 dark:text-gray-100">
+            {jobsData?.total_jobs ?? 0} jobs found
+          </p>
+
+          <div className="flex space-x-4">
+            <Button onClick={onOpenModal} color="gray">
+              <span className="font-medium dark:text-gray-200">Apply Filters</span>
+              <FontAwesomeIcon icon={faFilter} className="ml-2 text-gray-600 dark:text-gray-200" />
+            </Button>
+
+            <OrderBy
+              sortState={[orderBy, setOrderBy]}
+              onSortChange={() => {
+                setPage(1);
+              }}
+            />
+          </div>
+        </div>
+
+        <Element name="skeletonLoader">
+          {(getJobsIsLoading || getJobsIsFetching) && !jobsError && (
+            <>
+              {[...Array(3)].map((_, index) => (
+                <div key={index}>
+                  <hr className="border-gray-300 dark:border-gray-600 my-10" />
+                  <SkeletonLoader />
                 </div>
               ))}
-          </div>
+              <div className="mb-28"></div>
+            </>
+          )}
+        </Element>
 
-          <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
-          <div className="py-4">
-            <div className="flex space-x-4">
-              <Button onClick={onCloseModal}>Apply Filters</Button>
-              <Button
-                color="gray"
-                onClick={() => {
-                  setSelectedTags([]);
-                }}
-              >
-                Clear All Filters
-              </Button>
+        <div>
+          {!getJobsIsLoading &&
+            !jobsError &&
+            jobsData &&
+            jobsData.jobs.map((job) => (
+              <JobPost job={job} showDistance={showDistance} />
+            ))}
+
+          {!getJobsIsLoading && !jobsError && jobsData && (
+            <div className="py-16">
+              <Paginator
+                page={page}
+                setPage={setPage}
+                pageSize={pageSize}
+                totalJobs={jobsData.total_jobs}
+              />
             </div>
-          </div>
-        </>
-      </Modal>
+          )}
+        </div>
+
+        <Modal open={open} onClose={onCloseModal}>
+          <>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Filter Jobs
+            </h3>
+            <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+            <div className="flex flex-col">
+              {tagsData &&
+                TAG_CATEGORIES.map((category) => (
+                  <div className="mb-5">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {titleize(category)}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-1">
+                      {tagsData.tags[category] && tagsData.tags[category].map((tag) => {
+                        const id = `${category}:${tag}`;
+                        return (
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={id}
+                              className="mr-2"
+                              checked={selectedTags.includes(id)}
+                              value={id}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label
+                              htmlFor={id}
+                              className="text-gray-900 dark:text-white"
+                            >
+                              {formatTag(id)}
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
+            <div className="py-4">
+              <div className="flex space-x-4">
+                <Button onClick={onCloseModal}>Apply Filters</Button>
+                <Button
+                  color="gray"
+                  onClick={() => {
+                    setSelectedTags([]);
+                  }}
+                >
+                  Clear All Filters
+                </Button>
+              </div>
+            </div>
+          </>
+        </Modal>
+      </div>
     </div>
   );
 }
