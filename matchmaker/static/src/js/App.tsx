@@ -271,8 +271,8 @@ function App() {
         </div>
 
 
-        <div className="my-20">
-          <div className="flex flex-col items-center justify-center w-full mt-20">
+        <div className="my-10">
+          <div className="flex flex-col items-center justify-center w-full">
             <h1 className="text-2xl sm:text-4xl  font-bold text-gray-900 dark:text-gray-100 ">
               HN Resume to Jobs
             </h1>
