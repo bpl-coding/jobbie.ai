@@ -273,13 +273,13 @@ function App() {
 
         <div className="my-10">
           <div className="flex flex-col items-center justify-center w-full">
-            <h1 className="text-2xl sm:text-4xl  font-bold text-gray-900 dark:text-gray-100 ">
+            <h1 className="text-2xl sm:text-4xl  font-bold text-gray-900 dark:text-gray-200 ">
               HN Resume to Jobs
             </h1>
           </div>
 
           <div className="flex flex-row items-center justify-center w-full">
-            <h2 className="text-gray-900 dark:text-gray-100 mr-1">
+            <h2 className="text-gray-900 dark:text-gray-200 mr-1">
               Find jobs most relevant to your resume for
             </h2>
 
@@ -370,7 +370,7 @@ function App() {
 
         <div className="flex justify-between">
 
-          <p className="text-lg text-gray-900 dark:text-gray-100">
+          <p className="text-lg text-gray-900 dark:text-gray-200">
             {jobsData?.total_jobs ?? 0} jobs found
           </p>
 
@@ -423,9 +423,13 @@ function App() {
           )}
         </div>
 
-        <Modal open={open} onClose={onCloseModal}>
-          <>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        <Modal open={open} onClose={onCloseModal}
+          classNames={{
+            modal: 'p-0',
+          }}
+        >
+          <div className="bg-white dark:bg-slate-800 p-5">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2">
               Filter Jobs
             </h3>
             <hr className="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
@@ -434,7 +438,7 @@ function App() {
               {tagsData &&
                 TAG_CATEGORIES.map((category) => (
                   <div className="mb-5">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-2">
                       {titleize(category)}
                     </h3>
                     <div className="grid grid-cols-2 gap-1">
@@ -452,7 +456,7 @@ function App() {
                             />
                             <label
                               htmlFor={id}
-                              className="text-gray-900 dark:text-white"
+                              className="text-gray-900 dark:text-gray-200"
                             >
                               {formatTag(id)}
                             </label>
@@ -478,7 +482,7 @@ function App() {
                 </Button>
               </div>
             </div>
-          </>
+          </div>
         </Modal>
       </div>
     </div>

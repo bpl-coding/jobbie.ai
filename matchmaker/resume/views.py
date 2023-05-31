@@ -112,7 +112,6 @@ def get_jobs(request, params: JobsQueryParams = Query(...)):
             tags[category].append(tag)
 
         for category, tags in tags.items():
-            print(category, tags)
             closest_jobs = closest_jobs.filter(tags__name__in=tags)
 
     if params.order_by == "ascending":
