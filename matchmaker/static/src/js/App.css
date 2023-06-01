@@ -4,3 +4,9 @@ code {
   overflow-x: auto;
   white-space: pre-wrap;
 }
+
+.react-responsive-modal-overlay,
+.react-responsive-modal-container,
+.react-responsive-modal-modal {
+  animation-fill-mode: forwards !important;
+}
