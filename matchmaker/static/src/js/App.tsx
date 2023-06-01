@@ -173,11 +173,21 @@ function App() {
   const [showDistance, setShowDistance] = useState(false);
 
   const handleFileChange = async (event) => {
-    const selectedFile = event.target.files[0];
+
+    let selectedFile = null;
+    if (event.target) {
+      selectedFile = event.target.files[0];
+    } else {
+      selectedFile = event[0];
+    }
+
     const maxSize = 2 * 1024 * 1024; // 2MB
 
     if (selectedFile && selectedFile.size > maxSize) {
       setErrorMsg("File size must be under 2MB");
+      setFile(null);
+    } else if (selectedFile && selectedFile.type !== "application/pdf") {
+      setErrorMsg("File must be a PDF");
       setFile(null);
     } else {
       setErrorMsg(""); // Clear the error message if the file is within the allowed size
