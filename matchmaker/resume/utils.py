@@ -3,7 +3,7 @@ import openai
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
+@retry(wait=wait_random_exponential(min=1, max=5), stop=stop_after_attempt(3))
 def get_embedding(text: str, model="text-embedding-ada-002") -> list[float]:
     return openai.Embedding.create(input=[text], model=model)["data"][0]["embedding"]
 

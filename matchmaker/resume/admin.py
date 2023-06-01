@@ -9,12 +9,12 @@ from .models import HNJobPosting, HNWhosHiringPost, Resume
 
 class HNJobPostingAdmin(admin.ModelAdmin):
    model = HNJobPosting
-   exclude = ['embedding']
+   # exclude = ['embedding']
 
 
 class ResumeAdmin(admin.ModelAdmin):
    model = Resume
-   exclude = ['embedding']
+   # exclude = ['embedding']
 
 
 admin.site.register(HNJobPosting, HNJobPostingAdmin)
