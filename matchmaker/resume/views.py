@@ -173,4 +173,7 @@ def get_tags(request):
         tags[category].append(tag_name)
 
 
+    for tag, category in tags.items():
+        tags[tag] = sorted(category)
+
     return {"tags": tags}
