@@ -103,7 +103,7 @@ function App() {
     isLoading: getResumeIsLoading, // Whether the query is currently loading
     isFetching: getResumeIsFetching, // Whether the query is currently fetching in the background
   } = useResumeViewsGetResumeQuery(
-    { resumeUUID }, // Pass the resumeUUID as a parameter to the query
+    { resumeUuid: resumeUUID }, // Pass the resumeUUID as a parameter to the query
     { skip: resumeUUID === "" } // Optionally, skip the query if resumeUUID is -1
   );
 

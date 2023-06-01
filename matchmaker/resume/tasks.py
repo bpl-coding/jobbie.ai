@@ -256,7 +256,7 @@ def populate_tags():
             'python-flask': HNJobPosting.matching_words(['flask']),
             'python-fastapi': HNJobPosting.matching_words(['fastapi']),
             'rails': HNJobPosting.matching_words(['rails', 'ror']),
-            'react': HNJobPosting.matching_regex(r'\yreact\y(?!(-|\s)native)') | HNJobPosting.matching_words(['reactjs']),
+            'react': HNJobPosting.matching_regex(r'\yreact\y(?!(-|\s)native)') | HNJobPosting.matching_words(['reactjs', 'react', 'react.js']),
             'react-native': HNJobPosting.matching_words(['react-native']) | HNJobPosting.matching_regex(r'react native'),
             'ruby': HNJobPosting.matching_words(['ruby', 'rails', 'ror']),
             'rust': HNJobPosting.matching_words(['rust']),

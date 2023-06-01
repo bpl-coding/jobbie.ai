@@ -80,7 +80,7 @@ export type ResumeViewsCreateResumeApiArg = {
 };
 export type ResumeViewsGetResumeApiResponse = /** status 200 OK */ ResumeOut;
 export type ResumeViewsGetResumeApiArg = {
-  resumeUuid: number;
+  resumeUuid: string;
 };
 export type ResumeViewsGetTagsApiResponse = /** status 200 OK */ TagsOut;
 export type ResumeViewsGetTagsApiArg = void;
