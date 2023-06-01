@@ -10,3 +10,7 @@ code {
 .react-responsive-modal-modal {
   animation-fill-mode: forwards !important;
 }
+
+html {
+  overflow-x: hidden;
+}

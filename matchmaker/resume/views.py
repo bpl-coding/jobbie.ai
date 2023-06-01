@@ -147,10 +147,7 @@ def create_resume(request, resume: CreateResumeIn):
     if Resume.objects.filter(hash=hash).exists():
         resume = Resume.objects.get(hash=hash)
     else:
-        if len(resume_text) > 100:
-            embedding = get_embedding(resume_text)
-        else:
-            embedding = [-0.01] * 1536
+        embedding = get_embedding(resume_text)
         resume = Resume.objects.create(text=resume_text, embedding=embedding, hash=hash)
         resume.save()
 

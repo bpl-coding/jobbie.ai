@@ -79,10 +79,9 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+    
   redis:
     image: "redis:alpine"
-    ports:
-      - "6379:6379"
     networks:
       - redis
 

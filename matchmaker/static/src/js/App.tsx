@@ -398,7 +398,6 @@ function App() {
                   <SkeletonLoader />
                 </div>
               ))}
-              <div className="mb-28"></div>
             </>
           )}
         </Element>
