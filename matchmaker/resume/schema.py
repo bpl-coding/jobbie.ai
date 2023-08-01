@@ -39,7 +39,9 @@ class CreateResumeOut(Schema):
 class UploadResumeOut(Schema):
     text: str
 
-
+class ParseResumeTask(Schema):
+    task_id: str
+    
 class ResumeOut(Schema):
     uuid: str
     text: str

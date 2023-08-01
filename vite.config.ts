@@ -11,7 +11,7 @@ export default defineConfig({
   base: '/static/',
   root: path.resolve('./matchmaker/static/src'),
   server: {
-    host: '0.0.0.0',
+    host: 'localhost',
     port: 3000,
     strictPort: true,
     open: false,
@@ -20,7 +20,7 @@ export default defineConfig({
       disableGlobbing: false
     },
     hmr: {
-      host: '0.0.0.0',
+      host: 'localhost',
       port: 3000,
       protocol: 'ws',
     },

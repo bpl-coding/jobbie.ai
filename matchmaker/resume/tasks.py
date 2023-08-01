@@ -1,6 +1,7 @@
 import html
 import logging
 import os
+import requests
 from datetime import datetime
 from functools import partial
 
@@ -9,6 +10,7 @@ import openai
 from bs4 import BeautifulSoup
 from django.db import IntegrityError
 from taggit.models import Tag
+from celery import shared_task
 
 from matchmaker.celery import app
 
@@ -19,6 +21,54 @@ logger = logging.getLogger(__name__)
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
+@shared_task
+def parse_resume_to_json(text):    
+    # # Generate a response from GPT-3.5
+    # schema = requests.get("https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json")
+
+    # if schema.status_code == 200:
+    #     schema_as_str = schema.text
+    # else:
+    #     schema_as_str = ""
+
+    # # response=openai.ChatCompletion.create(
+    # #     model="gpt-3.5-turbo-16k",
+    # #     temperature=0,
+    # #     messages=[
+    # #         { "role": "system", "content": "You are a helpful assistant." },
+    # #         {"role": "user", "content": "Convert this resume into JSON Resume format: " + text},
+    # #     ],
+    # #     functions=[{ "name": "set_resume", "parameters": schema_as_str }],
+    # #     function_call={ "name": "set_resume" }
+    # # )
+    # # print(response)
+    # # parsed_json = response['choices'][0]["message"].function_call.arguments
+    # response=openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo-16k",
+    #     temperature=0,
+    #     messages=[
+    #         { "role": "system", "content": "You are a helpful assistant." },
+    #         {"role": "user", "content": "Convert this resume into JSON Resume format: " + text},
+    #     ],
+    #     functions=[{ 
+    #         "name": "set_resume", 
+    #         "parameters": {
+    #             "type": "object",
+    #             "properties": {
+    #                 "resume_text": { "type": "string" },
+    #                 "schema": { "type": "object" }
+    #             },
+    #             "required": ["resume_text", "schema"]
+    #         }
+    #     }],
+    #     function_call={ 
+    #         "name": "set_resume",
+    #         "arguments": { "resume_text": text, "schema": schema }
+    #     }
+    # )
+
+    # parsed_json = response['choices'][0]["message"]["content"]
+    return text
 
 def update_embeddings_for_job_postings(force=False):
     global get_embedding
@@ -80,9 +130,9 @@ def get_hn_job_postings(
 
     # get the post for the month/year
     post = HNWhosHiringPost.objects.filter_by_month_year(month, year).first()
-
+    print(post)
     job_postings = process_story_for_job_postings(post.hn_id, update_posts)
-
+    
     HNJobPosting.objects.bulk_create(job_postings, ignore_conflicts=True)
     update_embeddings_for_job_postings(update_embeddings)
 

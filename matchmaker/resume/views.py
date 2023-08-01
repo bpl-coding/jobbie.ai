@@ -18,6 +18,7 @@ from .models import HNJobPosting, HNWhosHiringPost, Resume
 from .schema import (
     CreateResumeIn,
     CreateResumeOut,
+    ParseResumeTask,
     HiringPostOut,
     HiringPostOutList,
     HNJobPostingSchemaOut,
@@ -28,11 +29,16 @@ from .schema import (
     UploadResumeOut,
 )
 from .tasks import get_hn_job_postings
+from .tasks import parse_resume_to_json
+from celery.result import AsyncResult
 from .utils import get_embedding
 from .validators import DistanceValidator
+from django.http import HttpResponse
+import json
+import os
+import openai
 
 router = Router()
-
 
 
 @router.post("resume/upload", tags=["resume"], response=UploadResumeOut)
@@ -52,18 +58,38 @@ def resume_pdf_to_text(request, file: UploadedFile = File(...)):
     txt_buffer = NamedTemporaryFile(suffix=".txt")
 
     subprocess.run(["pdftotext", pdf_buffer.name, txt_buffer.name], check=True)
-
     with open(txt_buffer.name, "r", encoding="utf-8", errors="replace") as f:
         text = f.read()
 
     # Remove non-printable characters
     text = ''.join(filter(lambda x: x in string.printable and x != '\f', text))
-
+    
     pdf_buffer.close()
     txt_buffer.close()
-
+    
+    # txt_buffer = NamedTemporaryFile(suffix=".txt")
+    # result = subprocess.run(['node', 'render.js'], input=text, text=True, capture_output=True)
+    # txt_buffer.close()
+    
     return {"text": text}
 
+@router.post("/parse", tags=["resume"], response=ParseResumeTask)
+def resume_text_to_json(request, resume: CreateResumeIn):
+    task = parse_resume_to_json.apply_async(args=[resume.text], queue='celery')
+    print("Celery task started!!!!!!!!!!!!!!!!!!!!!" + str(task.task_id),flush=True)
+    task_id = task.task_id
+    return {"task_id": task_id}
+
+@router.get("/parse/{task_id}", tags=["resume"],response=UploadResumeOut)
+def get_parse_result(request, task_id: str):
+    result = AsyncResult(task_id)
+    if result.ready():
+        try:
+            return {"text": result.get(timeout=1.0)}
+        except Exception as e:
+            return {"text": str(e)}
+    else:
+        return {"text": "PENDING"}
 
 @router.get(
     "jobs",
@@ -158,6 +184,32 @@ def create_resume(request, resume: CreateResumeIn):
 def get_resume(request, resume_uuid: str):
     resume = get_object_or_404(Resume, uuid=resume_uuid)
     return ResumeOut(text=resume.text, uuid=resume.uuid.hex)
+
+
+@router.get("/resume/{resume_uuid}/download", tags=["resume"])
+def download_resume(request, resume_uuid: str):
+    # Fetch the resume object
+    resume = get_object_or_404(Resume, uuid=resume_uuid)
+    
+    #Convert the resume json to html with theme
+    html_string = create_html(resume, theme_name, language)
+
+    # Convert the dictionary to a JSON string
+    json_resume_str = json.dumps(json_resume, indent=4)
+    
+    # Create a response with the JSON Resume as the body, the correct
+    # content type for JSON, and headers that instruct the browser to
+    # download the file with a particular filename.
+    response = HttpResponse(
+        html_string,
+        content_type='application/json',
+        headers={
+            'Content-Disposition': 'attachment; filename="resume.html"',
+        },
+    )
+    
+    return response
+
 
 @router.get("/tags", tags=["tags"], response=TagsOut)
 def get_tags(request):

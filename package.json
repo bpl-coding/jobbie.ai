@@ -14,9 +14,18 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@icons-pack/react-simple-icons": "^8.0.1",
     "@reduxjs/toolkit": "^1.9.3",
+    "@rjsf/core": "^5.8.1",
+    "@rjsf/utils": "^5.8.1",
+    "@rjsf/validator-ajv8": "^5.8.1",
+    "antd": "^5.6.1",
     "flowbite": "^1.6.5",
     "flowbite-react": "^0.4.4",
+    "jsonresume-theme-even": "^0.18.1",
+    "llm-api": "^0.9.4",
+    "luxon": "^3.3.0",
+    "openai": "^3.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
@@ -25,7 +34,8 @@
     "react-router-dom": "^6.11.1",
     "react-scroll": "^1.8.9",
     "remark-gfm": "^3.0.1",
-    "tailwindcss": "^3.3.1"
+    "tailwindcss": "^3.3.1",
+    "zod-gpt": "^0.6.5"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "10.0.3",

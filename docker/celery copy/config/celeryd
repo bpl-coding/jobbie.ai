@@ -6,8 +6,8 @@ CELERY_APP="matchmaker"
 CELERY_BIN="/usr/local/bin/celery"
 
 # Where to chdir at start.
-CELERYD_CHDIR="/usr/src/app/django/matchmaker"
-CELERYBEAT_CHDIR="/usr/src/app/django/matchmaker"
+CELERYD_CHDIR="/usr/src/app/django/matchmaker-project"
+CELERYBEAT_CHDIR="/usr/src/app/django/matchmaker-project"
 
 # Extra command-line arguments to the worker
 # CELERYD_OPTS="-Q:celery"

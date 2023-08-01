@@ -42,16 +42,46 @@ WORKDIR /usr/src/app
 
 RUN apt update \
         && apt install -y --no-install-recommends \ 
+        build-essential gcc git curl cmake \
         libpq-dev \
         wget \
         fontconfig \ 
     && rm -rf /var/lib/apt/lists/*
 
 # Download xpdf-tools-linux, extract and install pdftotext
-RUN wget https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
-    && tar -xzf xpdf-tools-linux-4.04.tar.gz \
-    && mv xpdf-tools-linux-4.04/bin64/pdftotext /usr/bin/ \
-    && rm -rf xpdf-tools-linux-4.04 xpdf-tools-linux-4.04.tar.gz
+# RUN wget https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
+#     && tar -xzf xpdf-tools-linux-4.04.tar.gz \
+#     && mv xpdf-tools-linux-4.04/bin64/pdftotext /usr/bin/ \
+#     && rm -rf xpdf-tools-linux-4.04 xpdf-tools-linux-4.04.tar.gz
+
+## Alternative: Build from source due to crossplatform issues with M1 macs
+# RUN curl -O https://dl.xpdfreader.com/xpdf-4.04.tar.gz && \
+#      tar -xvf xpdf-4.04.tar.gz && \
+#      cd xpdf-4.04 && \
+#      cmake . && \
+#      make && \
+#      cp xpdf/pdftotext /opt && \
+#      cd .. && \
+#      rm -rf xpdf-4.04
+# Install required dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    wget \
+    libpoppler-cpp-dev \
+    pkg-config \
+    python3-dev
+
+# Download and build pdftotext from source
+RUN wget https://dl.xpdfreader.com/xpdf-4.04.tar.gz && \
+    tar -xzf xpdf-4.04.tar.gz && \
+    cd xpdf-4.04 && \
+    cmake . && \
+    make && \
+    cp xpdf/pdftotext /usr/local/bin
+
+# # Clean up the container by removing files we no longer need
+# RUN rm -rf /xpdf-4.04 && \
+#     rm /xpdf-4.04.tar.gz
 
 COPY ./matchmaker ./matchmaker
 COPY ./docker/django ./docker/django

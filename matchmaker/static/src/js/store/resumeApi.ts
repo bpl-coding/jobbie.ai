@@ -11,6 +11,22 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.body,
       }),
     }),
+    resumeViewsResumeTextToJson: build.mutation<
+      ResumeViewsResumeTextToJsonApiResponse,
+      ResumeViewsResumeTextToJsonApiArg
+    >({
+      query: (queryArg) => ({ 
+        url: `/api/parse`,
+        method: "POST",
+        body: queryArg.createResumeIn
+      }),
+    }),
+    resumeViewsGetResumeTextToJsonResult: build.query<
+      ResumeViewsGetResumeTextToJsonResultApiResponse,
+      ResumeViewsGetResumeTextToJsonResultApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/parse/${queryArg.task_id}` }),
+    }),
     resumeViewsGetJobs: build.query<
       ResumeViewsGetJobsApiResponse,
       ResumeViewsGetJobsApiArg
@@ -54,7 +70,9 @@ const injectedRtkApi = api.injectEndpoints({
   }),
   overrideExisting: false,
 });
+
 export { injectedRtkApi as resumeApi };
+
 export type ResumeViewsResumePdfToTextApiResponse =
   /** status 200 OK */ UploadResumeOut;
 export type ResumeViewsResumePdfToTextApiArg = {
@@ -62,6 +80,17 @@ export type ResumeViewsResumePdfToTextApiArg = {
     file: Blob;
   };
 };
+export type ResumeViewsResumeTextToJsonApiResponse =
+  /** status 200 OK */ UploadResumeOut;
+export type ResumeViewsResumeTextToJsonApiArg = {
+  createResumeIn: CreateResumeIn;
+};
+
+export type ResumeViewsGetResumeTextToJsonResultApiResponse = /** status 200 OK */ ResumeOut;
+export type ResumeViewsGetResumeTextToJsonResultApiArg = {
+  task_id?: string;
+}
+
 export type ResumeViewsGetJobsApiResponse = /** status 200 OK */ JobsOut;
 export type ResumeViewsGetJobsApiArg = {
   resumeUuid: string;
@@ -73,6 +102,7 @@ export type ResumeViewsGetJobsApiArg = {
   orderBy?: string;
   tags?: string;
 };
+
 export type ResumeViewsCreateResumeApiResponse =
   /** status 200 OK */ CreateResumeOut;
 export type ResumeViewsCreateResumeApiArg = {
@@ -82,11 +112,14 @@ export type ResumeViewsGetResumeApiResponse = /** status 200 OK */ ResumeOut;
 export type ResumeViewsGetResumeApiArg = {
   resumeUuid: string;
 };
+
 export type ResumeViewsGetTagsApiResponse = /** status 200 OK */ TagsOut;
 export type ResumeViewsGetTagsApiArg = void;
+
 export type UploadResumeOut = {
   text: string;
 };
+
 export type HnJobPostingSchemaOut = {
   id?: number;
   whos_hiring_post: number;
@@ -120,6 +153,8 @@ export type TagsOut = {
 };
 export const {
   useResumeViewsResumePdfToTextMutation,
+  useResumeViewsResumeTextToJsonMutation,
+  useResumeViewsGetResumeTextToJsonResultQuery,
   useResumeViewsGetJobsQuery,
   useResumeViewsCreateResumeMutation,
   useResumeViewsGetResumeQuery,

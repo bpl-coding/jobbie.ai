@@ -28,7 +28,6 @@ const JobPost: React.FC<JobPostProps> = ({
                         {job.posted_by}
                     </a>
                 </div>
-
                 <div>
                     <div className="px-10 pb-5 flex flex-row items-center">
                         <a href={"https://news.ycombinator.com/item?id=" + job.hn_id}>
@@ -42,7 +41,6 @@ const JobPost: React.FC<JobPostProps> = ({
                             </div>
                         }
                     </div>
-
                 </div>
             </div>
             <div

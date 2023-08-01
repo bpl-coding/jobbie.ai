@@ -5,6 +5,7 @@ x-shared-volumes:
   volumes:
     - ./matchmaker:/usr/src/app/matchmaker
     - ./docker:/usr/src/app/docker
+    - .:/code
 
 services:
   django:
@@ -17,6 +18,7 @@ services:
        - BUILDKIT_INLINE_CACHE=1
     depends_on:
       - postgres
+      - redis
     environment:
       - DJANGO_POSTGRES_USER=${DJANGO_POSTGRES_USER}
       - DJANGO_POSTGRES_DB=${DJANGO_POSTGRES_DB}
@@ -36,7 +38,7 @@ services:
     ports:
       - "8888:8888"
     # <<: *shared-volumes
-
+    
   celery-worker:
     restart: always
     build:
@@ -44,6 +46,8 @@ services:
       dockerfile: docker/celery-worker/Dockerfile
       args:
         - BUILDKIT_INLINE_CACHE=1
+    volumes:
+      - .:/code
     depends_on:
       - postgres
       - redis
@@ -61,8 +65,8 @@ services:
     networks:
       - postgres
       - redis
-    # <<: *shared-volumes
-
+    # <<: *shared-volume
+  
   postgres:
     container_name: postgres
     build:
@@ -84,6 +88,10 @@ services:
     image: "redis:alpine"
     networks:
       - redis
+    expose:
+      - '6379'
+    ports:
+      - 6379:6379
 
 networks:
   postgres:
